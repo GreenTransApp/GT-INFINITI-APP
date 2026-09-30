@@ -308,8 +308,11 @@ class OtexPickupRepoImpl {
     }
 
     try {
+      //  CommonResponse resp =
+          // await apiPostWithModel("${lmdUrl}UpsertOtexPickup_V2", params);
+
       CommonResponse resp =
-          await apiPostWithModel("${lmdUrl}UpsertOtexPickup_V2", params);
+          await apiPostWithModel("${lmdUrl}UpsertOtexPickup", params);
 
       if (resp.commandStatus == 1) {
         Map<String, dynamic> table = jsonDecode(resp.dataSet.toString());

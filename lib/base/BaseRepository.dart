@@ -8,6 +8,7 @@ import 'package:gtlmd/api/HttpCalls.dart';
 import 'package:gtlmd/common/Utils.dart';
 import 'package:gtlmd/common/commonResponse.dart';
 import 'package:gtlmd/optionMenu/operations/models/operationsModel.dart';
+import 'package:gtlmd/pages/login/models/UpdatePasswordModel.dart';
 import 'package:gtlmd/pages/mapView/models/mapConfigDetailModel.dart';
 import 'package:gtlmd/pages/orders/drsSelection/model/DrsListModel.dart';
 import 'package:gtlmd/pages/trips/tripDetail/Model/currentDeliveryModel.dart';
@@ -20,6 +21,7 @@ class BaseRepository {
   StreamController<String> accResp = StreamController();
   StreamController<String> compAccPara = StreamController();
   StreamController<MapConfigDetailModel> mapConfigDetail = StreamController();
+  StreamController<CommonUpdateModel> sendAlertResp = StreamController();
   StreamController<String> scannedCode = StreamController();
   StreamController<OperationsModel> urlModel = StreamController();
 
@@ -214,6 +216,43 @@ class BaseRepository {
       rethrow;
     }
     return '';
+  }
+
+  Future<void> sendShareAlert(Map<String, String> params) async {
+     viewDialog.add(true);
+    final hasInternet = await NetworkStatusService().hasConnection;
+
+    if (hasInternet) {
+      try {
+        // viewDialog.add(true);
+        CommonResponse resp = await apiPostWithModel("${lmdUrl}sendShareAlertFromLMD", params);
+        if (resp.commandStatus == 1) {
+          Map<String, dynamic> table = jsonDecode(resp.dataSet.toString());
+          Iterable<MapEntry<String, dynamic>> entries = table.entries;
+          for (final entry in entries) {
+            if (entry.key == "Table") {
+              List<dynamic> list2 = entry.value;
+              List<CommonUpdateModel> resultList = List.generate(
+                  list2.length,
+                  (index) => CommonUpdateModel.fromJson(list2[index]));
+              sendAlertResp.add(resultList[0]);
+            }
+          }
+        } else {
+          isErrorLiveData.add(resp.commandMessage!);
+        }
+        viewDialog.add(false);
+      } on SocketException catch (_) {
+        isErrorLiveData.add("No Internet");
+        viewDialog.add(false);
+      } catch (err) {
+        isErrorLiveData.add(err.toString());
+        viewDialog.add(false);
+      }
+    } else {
+      viewDialog.add(false);
+      isErrorLiveData.add("No Internet available");
+    }
   }
 
   Future<String> getStickerData(Map<String, String> params) async {

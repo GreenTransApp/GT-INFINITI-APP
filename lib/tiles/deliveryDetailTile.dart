@@ -5,10 +5,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gtlmd/base/BaseRepository.dart';
+import 'package:gtlmd/bottomSheet/socialShareBottomSheet/socialShareBottomSheet.dart';
 import 'package:gtlmd/common/Colors.dart';
 import 'package:gtlmd/common/Utils.dart';
 import 'package:gtlmd/common/alertBox/commonAlertDialog.dart';
 import 'package:gtlmd/common/alertBox/loadingAlertWithCancel.dart';
+
 import 'package:gtlmd/common/commonModel/pageLinkJsonParams.dart';
 import 'package:gtlmd/common/toast.dart';
 import 'package:gtlmd/design_system/size_config.dart';
@@ -510,7 +512,10 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                               } catch (e) {
                                 targetMenu = null;
                               }
-                              getBookingPrintLink(menuCode);
+                              // getBookingPrintLink(menuCode);
+        //                         shareAlertDialog(context, "ALERT!", "Are you sure you want to logout?",""
+        // );
+                              showSocialShareBottomSheetBottomSheet(context, widget.model.generatedGr.toString(),menuCode);
                               break;
                             case 'map':
                               {

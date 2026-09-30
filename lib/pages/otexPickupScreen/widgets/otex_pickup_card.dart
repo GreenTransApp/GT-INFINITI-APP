@@ -52,6 +52,7 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
   // String? _itemImagePath = "";
   List<String> bookingImages = [];
   String _selectedSignaturePath = '';
+  bool? sendWhatsapp = false;
 
   @override
   void initState() {
@@ -177,7 +178,7 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
     }
     setState(() => _isSaving = true);
     final success = await provider.saveCardEntry(
-        widget.index, bookingImages, _selectedSignaturePath);
+        widget.index, bookingImages, _selectedSignaturePath,sendWhatsapp?? false);
     if (mounted) setState(() => _isSaving = false);
 
     if (success && mounted) {
@@ -812,15 +813,28 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
                   ),
 
           ),
-         
-         
-
           SizedBox(
-            height: SizeConfig.mediumVerticalSpacing,
+            height: SizeConfig.extraSmallVerticalPadding,
+          ),
+         
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text("Send Whatsappp Message",style: TextStyle(fontWeight: FontWeight.bold,fontSize: SizeConfig.extraSmallTextSize)),
+            Checkbox(
+               activeColor: CommonColors.colorPrimary,
+               value: sendWhatsapp,
+               onChanged: (checked) {
+                 sendWhatsapp = checked;
+                 setState(() {}); }),
+          ],
+        ),
+          SizedBox(
+            height: SizeConfig.extraSmallVerticalPadding,
           ),
 
           // ── Buttons ──
-          const SizedBox(height: 16),
+          // const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 8),
 

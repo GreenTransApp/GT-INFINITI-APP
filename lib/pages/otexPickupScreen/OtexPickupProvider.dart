@@ -428,7 +428,7 @@ class OtexPickupProvider extends ChangeNotifier {
   }
 
   Future<bool> saveCardEntry(
-      int index, List<String> bookingImages, String signImagePath) async {
+      int index, List<String> bookingImages, String signImagePath,bool sendWhatsapp) async {
     if (index >= _state.splitInfo.length) return false;
 
     // // Validate total pieces before saving
@@ -579,6 +579,7 @@ class OtexPickupProvider extends ChangeNotifier {
         "entrylocation": currentAddress,
         "entrylocationlat": position.latitude.toString()?? "",
         "entrylocationlong": position.longitude.toString() ?? "",
+        "sendwhatsapp" : sendWhatsapp == true? 'Y' : 'N'
       };
     }
 
