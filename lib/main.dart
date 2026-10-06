@@ -110,6 +110,7 @@ class SizeConfigInitializer extends StatelessWidget {
     return child;
   }
 }
+
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({super.key});
 
@@ -163,6 +164,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         debugPrint('Going to HomeScreen');
         getUserData();
         _goToHomeScreen();
+        // getUserData().then((user) => {
+        //       if (user.commandstatus == null || user.commandstatus == -1)
+        //         throw Exception(user.commandmessage ?? "User data not found.")
+        //       else
+        //         {_goToHomeScreen()}
+        //     });
       } else {
         debugPrint('Login failed but status success (re-check logic)');
         _goToHomeScreen(); // Following original flow

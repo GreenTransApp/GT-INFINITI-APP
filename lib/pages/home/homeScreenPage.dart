@@ -24,6 +24,7 @@ import 'package:gtlmd/navigateRoutes/Routes.dart';
 import 'package:gtlmd/navigateRoutes/RoutesName.dart';
 import 'package:gtlmd/pages/attendance/attendanceScreen.dart';
 import 'package:gtlmd/pages/attendance/models/attendanceModel.dart';
+import 'package:gtlmd/pages/dashboard/userDashboard/userDashboardPage.dart';
 import 'package:gtlmd/pages/home/Model/allotedRouteModel.dart';
 import 'package:gtlmd/pages/home/Model/moduleModel.dart';
 import 'package:gtlmd/pages/home/Model/notificationCountModel.dart';
@@ -174,6 +175,25 @@ class _HomeScreen extends State<HomeScreen>
     _baseRepo.getInfinitiOpsLink(params);
   }
 
+  openFuelForm() {
+    PageLinkJsonParams param = PageLinkJsonParams(
+      drivercode: savedUser.drivercode.toString(),
+      grno: "",
+    );
+    Map<String, String> params = {
+      "prmlinkpagemenucode": "GTI_FUELINGDETAILMASTER",
+      "prmjsondatastr": jsonEncode(param),
+      "prmusercode": savedUser.usercode.toString(),
+      "prmmenucode": "GTAPP_FUELINGDETAIL",
+      "prmsessionid": savedUser.sessionid.toString(),
+      "prmloginbranchcode": savedUser.loginbranchcode.toString(),
+      "prmloginbranchtype": savedUser.loginbranchtype.toString(),
+    };
+
+    printParams(params);
+    _baseRepo.getInfinitiOpsLink(params);
+  }
+
   fetchOfflineDrsCounts() async {
     try {
       int pod = await DBHelper.getPodEntryCount();
@@ -260,11 +280,19 @@ class _HomeScreen extends State<HomeScreen>
           // } else if (validate.executiveid == null) {
           //   failToast("Invalid User details");
           //   authService.logout(context);
-        } else if (isNullOrEmpty(validate.executiveid.toString()) == false &&
-            int.parse(validate.executiveid.toString()) > 0) {
-          // getNotifiocaionCount();
-          // getDashboardDetails();
-        }
+        } else{
+           if(isNullOrEmpty(savedUser.drivercode)){
+              // Get.off(UserDashboardPage());
+            // failToast("Driver Details Not Found Please Contact Admin.");
+            // authService.logout(context);
+           }
+
+        } 
+        // else if (isNullOrEmpty(validate.executiveid.toString()) == false &&
+        //     int.parse(validate.executiveid.toString()) > 0) {
+        //   // getNotifiocaionCount();
+        //   // getDashboardDetails();
+        // }
       });
     }));
 
@@ -1236,8 +1264,13 @@ class _HomeScreen extends State<HomeScreen>
                       case 'offlinesync':
                         {
                           showOfflineDrsBottomSheet(context).then((value) {
-                            refreshScreen();
+                            // refreshScreen();
                           });
+                        }
+                        break;
+                      case 'fuelDetailEntry':
+                        {
+                          openFuelForm();
                         }
                         break;
                     }
@@ -1255,6 +1288,21 @@ class _HomeScreen extends State<HomeScreen>
                             width: 4,
                           ),
                           Text('Offline Sync')
+                        ],
+                      ),
+                    ),
+                     const PopupMenuItem(
+                      value: 'fuelDetailEntry',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_gas_station,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text('Fuel Detail Entry')
                         ],
                       ),
                     ),

@@ -579,7 +579,8 @@ class OtexPickupProvider extends ChangeNotifier {
         "entrylocation": currentAddress,
         "entrylocationlat": position.latitude.toString()?? "",
         "entrylocationlong": position.longitude.toString() ?? "",
-        "sendwhatsapp" : sendWhatsapp == true? 'Y' : 'N'
+        "sendwhatsapp" : sendWhatsapp == true? 'Y' : 'N',
+        // "oamount" :isNullOrEmpty( _state.info.oAmount.toString()) ? 0 : _state.info.oAmount.toString()
       };
     }
 

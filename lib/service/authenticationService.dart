@@ -8,6 +8,7 @@ import 'package:gtlmd/common/CommonResponse.dart' hide CommonResponse;
 import 'package:gtlmd/common/Environment.dart';
 import 'package:gtlmd/common/Toast.dart';
 import 'package:gtlmd/common/commonResponse.dart';
+import 'package:gtlmd/pages/dashboard/userDashboard/userDashboardPage.dart';
 import 'package:gtlmd/pages/home/Model/validateDeviceModel.dart';
 import 'package:gtlmd/pages/home/homeScreenPage.dart';
 import 'package:gtlmd/navigateRoutes/Routes.dart';
@@ -71,7 +72,20 @@ class AuthenticationService {
 
   void login(BuildContext context) {
     isAuthenticated.add(true);
+    //   UserModel userData = UserModel();
+    //   getUserData().then((user) => {
+    //           if (user.commandstatus == null || user.commandstatus == -1)
+    //             throw Exception("")
+    //           else
+    //             {
+    //               userData = user,
+    //             }
+    //         });
+    // if(isNullOrEmpty(userData.drivercode)){
+    // Get.off(UserDashboardPage());
+    // }else{
     Get.off(HomeScreen());
+    // }
   }
 
   void logout(BuildContext context) {
@@ -189,7 +203,7 @@ class AuthenticationService {
 
     if (response.validlogin == "N") {
       failToast(
-        response.commandmessage ?? "Invalid login",
+        response.commandmessage ?? "Invalid login.",
       );
 
       logout(context);
@@ -198,7 +212,7 @@ class AuthenticationService {
 
     if (response.singledevice == "N") {
       failToast(
-        response.commandmessage ?? "Device is already logged in",
+        response.commandmessage ?? "Device is already logged in another device.",
       );
       logout(context);
       return;
