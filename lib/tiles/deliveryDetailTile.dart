@@ -80,6 +80,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
   final BaseRepository _baseRepo = BaseRepository();
   List<StreamSubscription> _subscription = [];
   bool showAllCardInfo = true;
+  bool showCngeAddress = false;
   late LoadingAlertService loadingAlertService;
   @override
   void initState() {
@@ -337,6 +338,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
       showAllCardInfo = !showAllCardInfo;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -740,194 +742,296 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
 
                       // SizedBox(height: SizeConfig.smallVerticalSpacing),
 
-                      Text.rich(
-                        TextSpan(
+                  // Consignee Details
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: SizeConfig.smallHorizontalPadding,
+                            vertical: SizeConfig.extraSmallVerticalPadding),
+                        decoration: BoxDecoration(
+                          color: CommonColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextSpan(
-                              text: modelDetail.consignmenttype == 'P'
-                                  ? 'Consignor : '
-                                  : 'Consignee : ',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: SizeConfig.smallTextSize,
-                                fontWeight: FontWeight.normal,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: modelDetail.consignmenttype == 'P'
+                                        ? 'Consignor : '
+                                        : 'Consignee : ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.extraSmallTextSize,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: modelDetail.cngename ?? '',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.smallTextSize,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            TextSpan(
-                              text: modelDetail.cngename ?? '',
+                               // Consignment Details
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                          Row(
+                              children: [
+                                // Text(
+                                //   modelDetail.cngemobile ?? '—',
+                                //   style: TextStyle(
+                                //     fontWeight: FontWeight.w600,
+                                //     fontSize: SizeConfig.smallTextSize,
+                                //   ),
+                                // ),
+                              Text(
+                              // 'Mobile No.',
+                              modelDetail.consignmenttype == 'P'
+                              ? 'Consignor Mobile No. : '
+                              : 'Consignee Mobile No. : ',
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: SizeConfig.smallTextSize,
-                                fontWeight: FontWeight.w600,
+                                fontSize: SizeConfig.extraSmallTextSize,
                               ),
                             ),
+                            SizedBox(
+                                height:
+                                    SizeConfig.extraSmallHorizontalSpacing),
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 18),
+                                    children: [
+                                      TextSpan(
+                                        text: '${modelDetail.cngemobile}',
+                                        style: TextStyle(
+                                           fontSize: SizeConfig.extraSmallTextSize,
+                                            color: CommonColors.blue600,
+                                            decoration:
+                                                TextDecoration.underline),
+                                        // Use url_launcher to launch the URL
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () async {
+                                            if (status == "Pending" ||
+                                                status == "Un-Picked") {
+                                              _makePhoneCall(
+                                                  modelDetail.cngemobile);
+                                            } else {
+                                              failToast(
+                                                  "consignment already ${status}.");
+                                            }
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              
+                              ],
+                            ),
+
+                      
+                          ],
+                        ),
+                        
+                        SizedBox(height: SizeConfig.extraSmallVerticalSpacing),
+                         // Address Card
+                        AddressCard(
+                            // title: 'Address',
+                              title: modelDetail.consignmenttype == 'P'
+                                    ? 'Consignor Address: '
+                                    : 'Consignee Address: ',
+                            address: modelDetail.cngeaddress ?? '',
+                            color:
+                                statusIconColor.withAlpha((0.1 * 255).toInt())),
+                        
+                          ],
+                        ),
+                      ),
+                        SizedBox(height: SizeConfig.extraSmallVerticalSpacing),
+
+                      // Consignor Details
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: SizeConfig.smallHorizontalPadding,
+                            vertical: SizeConfig.extraSmallVerticalPadding),
+                        decoration: BoxDecoration(
+                          color: CommonColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: modelDetail.consignmenttype == 'P'
+                                        ? 'Consignee : '
+                                        : 'Consignor : ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.extraSmallTextSize,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: modelDetail.cngrname ?? '',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.smallTextSize,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                               // Consignment Details
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                            Text(
+                              // 'Mobile No.',
+                              modelDetail.consignmenttype == 'P'
+                              ? 'Consignee Mobile No.:'
+                              : 'Consignor Mobile No.:',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: SizeConfig.extraSmallTextSize,
+                              ),
+                            ),
+                            SizedBox(
+                                height:
+                                    SizeConfig.extraSmallHorizontalSpacing),
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 18),
+                                    children: [
+                                      TextSpan(
+                                        text: '${modelDetail.cngrmobileno}',
+                                        style: TextStyle(
+                                              fontSize: SizeConfig.extraSmallTextSize,
+                                            color: CommonColors.blue600,
+                                            decoration:
+                                                TextDecoration.underline),
+                                        // Use url_launcher to launch the URL
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () async {
+                                            if (status == "Pending" ||
+                                                status == "Un-Picked") {
+                                              _makePhoneCall(
+                                                  modelDetail.cngrmobileno);
+                                            } else {
+                                              failToast(
+                                                  "consignment already ${status}.");
+                                            }
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            
+                              ],
+                            ),
+                            
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                showCngeAddress = !showCngeAddress;
+                                });
+                              },
+                              child: CircleAvatar(
+                              backgroundColor: CommonColors.grey200,
+                              child:Icon(Icons.location_on_rounded, color: CommonColors.colorPrimary2, size: SizeConfig.smallIconSize,),),
+                            ),
+                          ],
+                        ),
+                        
+                        // SizedBox(height: SizeConfig.extraSmallVerticalSpacing),
+                         // Address Card
+                        Visibility(
+                          visible: showCngeAddress,
+                          child: Padding(
+                            padding:  EdgeInsets.only(top: SizeConfig.extraSmallVerticalSpacing),
+                            child: AddressCard(
+                                // title: 'Address',
+                                  title: modelDetail.consignmenttype == 'P'
+                                        ? 'Consignee Address: '
+                                        : 'Consignor Address: ',
+                                address: modelDetail.cngraddress ?? '',
+                                color:
+                                    statusIconColor.withAlpha((0.1 * 255).toInt())),
+                          ),
+                        ),
+                        
                           ],
                         ),
                       ),
 
-                      SizedBox(
-                        height: SizeConfig.smallVerticalSpacing,
-                      ),
+                      // SizedBox(
+                      //   height: SizeConfig.smallVerticalSpacing,
+                      // ),
 
-                      // Address Card
-                      AddressCard(
-                          title: 'Address',
-                          address: modelDetail.cngeaddress ?? '',
-                          color:
-                              statusIconColor.withAlpha((0.1 * 255).toInt())),
-                      // Consignment Details
+                   
                       Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Pcs',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: SizeConfig.smallTextSize,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${modelDetail.pcs}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: SizeConfig.smallTextSize,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Mobile No.',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: SizeConfig.smallTextSize,
-                                  ),
-                                ),
-                                SizedBox(
-                                    height:
-                                        SizeConfig.extraSmallVerticalSpacing),
-                                Row(
-                                  children: [
-                                    // Text(
-                                    //   modelDetail.cngemobile ?? '—',
-                                    //   style: TextStyle(
-                                    //     fontWeight: FontWeight.w600,
-                                    //     fontSize: SizeConfig.smallTextSize,
-                                    //   ),
-                                    // ),
-                                    RichText(
-                                      text: TextSpan(
-                                        style: const TextStyle(
-                                            color: Colors.black, fontSize: 18),
-                                        children: [
-                                          TextSpan(
-                                            text: '${modelDetail.cngemobile}',
-                                            style: TextStyle(
-                                                color: CommonColors.blue600,
-                                                decoration:
-                                                    TextDecoration.underline),
-                                            // Use url_launcher to launch the URL
-                                            recognizer: TapGestureRecognizer()
-                                              ..onTap = () async {
-                                                if (status == "Pending" ||
-                                                    status == "Un-Picked") {
-                                                  _makePhoneCall(
-                                                      modelDetail.cngemobile);
-                                                } else {
-                                                  failToast(
-                                                      "consignment already ${status}.");
-                                                }
-                                              },
-                                          ),
-                                        ],
-                                      ),
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Pcs',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.smallTextSize,
                                     ),
-                                    // Visibility(
-                                    //   visible: status == "Pending" ||
-                                    //       status == "Un-Picked",
-                                    //   child: const SizedBox(
-                                    //     width: 10,
-                                    //   ),
-                                    // ),
-                                    // Visibility(
-                                    //   visible: status == "Pending" ||
-                                    //       status == "Un-Picked",
-                                    //   child: Container(
-                                    //     decoration: BoxDecoration(
-                                    //       color: status == "Pending" ||
-                                    //               status == "Un-Picked"
-                                    //           ? CommonColors.colorPrimary
-                                    //           : CommonColors.grey400,
-                                    //       borderRadius: BorderRadius.circular(
-                                    //           SizeConfig.extraLargeRadius),
-                                    //     ),
-                                    //     width: SizeConfig
-                                    //         .extraLargeHorizontalPadding,
-                                    //     height: SizeConfig
-                                    //         .extraLargeVerticalPadding,
-                                    //     child: Center(
-                                    //       child: GestureDetector(
-                                    //           onTap: () {
-                                    //             if (status == 'Pending' ||
-                                    //                 status == 'Un-Picked') {
-                                    //               if (!isNullOrEmpty(
-                                    //                   modelDetail.cngemobile)) {
-                                    //                 commonAlertDialog(
-                                    //                     context,
-                                    //                     "Make a phone call?",
-                                    //                     "Are you sure you want to call ${modelDetail.cngemobile}?",
-                                    //                     "",
-                                    //                     Icon(
-                                    //                         Icons
-                                    //                             .phone_outlined,
-                                    //                         size: SizeConfig
-                                    //                             .extraSmallIconSize),
-                                    //                     () {
-                                    //                   _makePhoneCall(modelDetail
-                                    //                       .cngemobile);
-                                    //                 });
-                                    //               }
-                                    //               //  else {
-                                    //               //   commonAlertDialog(
-                                    //               //       context,
-                                    //               //       "Invalid Phone Number",
-                                    //               //       "The phone number is not valid",
-                                    //               //       'address',
-                                    //               //       Icon(
-                                    //               //         Icons.phone_outlined,
-                                    //               //         size: SizeConfig
-                                    //               //             .smallIconSize,
-                                    //               //       ),
-                                    //               //       () {});
-                                    //               // }
-                                    //             }
-                                    //           },
-                                    //           child: Icon(
-                                    //             Icons.call_outlined,
-                                    //             color: CommonColors.White,
-                                    //             size: SizeConfig.smallIconSize,
-                                    //           )),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${modelDetail.pcs}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: SizeConfig.smallTextSize,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: SizeConfig.smallVerticalSpacing),
-
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                 Text(
+                                    'Reference No.',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: SizeConfig.smallTextSize,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    isNullOrEmpty(modelDetail.referenceno) ? 'N/A' : '${modelDetail.referenceno}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: SizeConfig.smallTextSize,
+                                    ),
+                                  ),],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        SizedBox(height: SizeConfig.smallVerticalSpacing),
+                        
                       // Action Buttons for Pending
                       Container(
                         padding: EdgeInsets.symmetric(

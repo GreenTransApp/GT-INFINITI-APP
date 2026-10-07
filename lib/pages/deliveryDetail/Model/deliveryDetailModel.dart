@@ -55,6 +55,10 @@ class DeliveryDetailModel {
   String? destname;
   int? jobid;
   String? showdeparted;
+  String? referenceno;
+  String? cngrname;
+  String? cngraddress;
+  String? cngrmobileno;
   
 
   DeliveryDetailModel(
@@ -111,6 +115,10 @@ class DeliveryDetailModel {
        this.destname,
        this.jobid,
        this.showdeparted,
+       this.referenceno,
+       this.cngrname,
+       this.cngraddress,
+       this.cngrmobileno,
       });
 
   factory DeliveryDetailModel.fromJson(Map<String, dynamic> json) {
@@ -168,7 +176,10 @@ class DeliveryDetailModel {
       destname: json['destname'],
       jobid: json['jobid'],
       showdeparted: json['showdeparted'],
-      
+      referenceno: json['referenceno'],
+      cngrname: json['cngrname'],
+      cngraddress: json['cngraddress'],
+      cngrmobileno: json['cngrmobileno'],
     );
   }
 
@@ -227,7 +238,10 @@ class DeliveryDetailModel {
       'destname': destname,
       'jobid': jobid,
       'showdeparted': showdeparted,
-      
+      'referenceno': referenceno,
+      'cngrname': cngrname,
+      'cngraddress': cngraddress,
+      'cngrmobileno': cngrmobileno,
     };
   }
 }
