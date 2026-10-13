@@ -11,6 +11,7 @@ import 'package:gtlmd/pages/dashboard/userDashboard/userDashBoardViewModel.dart'
 import 'package:gtlmd/pages/home/Model/menuModel.dart';
 import 'package:gtlmd/pages/home/Model/moduleModel.dart';
 import 'package:gtlmd/pages/home/homeScreenPage.dart';
+import 'package:gtlmd/pages/operations/webViewPage.dart';
 
 class UserDashboardPage extends StatefulWidget {
   const UserDashboardPage({super.key});
@@ -27,6 +28,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   List<MenuModel> filteredMenuList = List.empty(growable: true);
   late LoadingAlertService loadingAlertService;
   String selectedModule = 'OPERATIONS';
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -140,6 +142,12 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     };
     await _viewModel.getMenu(params);
   }
+   changeModule(String module) {
+    selectedModule = module;
+    filteredMenuList.clear();
+    menuTypeList.clear();
+    getMenu();
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -159,38 +167,69 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           drawer: SideMenu(),
           body: Column(
             children: [
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.1,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: moduleList.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 16),
-                      child: Container(
-                        width: SizeConfig.screenWidth * 0.3,
-                        decoration: BoxDecoration(
-                          color: CommonColors.colorPrimary,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                            child: Text(moduleList[index].modulename ?? "")),
-                      ),
-                    );
-                  },
-                ),
+              InkWell(
+                onTap: () {
+                  failToast("Test button clicked");
+                    Get.to(() => Webviewpage());
+
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: SizeConfig.smallVerticalPadding),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: SizeConfig.smallHorizontalPadding,
+                      vertical: SizeConfig.smallVerticalPadding),
+                  decoration: BoxDecoration(
+                    color: CommonColors.colorPrimary,
+                    borderRadius: BorderRadius.all(Radius.circular(SizeConfig.smallRadius)),
+                  ),
+                  child: Text('test')),
               ),
-              // Expanded(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField<String>(
+                                value: selectedModule,
+                                decoration: _inputDecoration('Select Module', null),
+                                items: moduleList.map((ModulesModel relation) {
+                                  return DropdownMenuItem<String>(
+                                    value: relation.modulename,
+                                    child: Text(relation.modulename ?? ""),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  changeModule(newValue.toString());
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please select a module';
+                                  }
+                                  return null;
+                                },
+                              ),
+              ),
+                          
+              // SizedBox(
+              //   height: SizeConfig.screenHeight * 0.1,
               //   child: ListView.builder(
-              //     itemCount: filteredMenuList.length,
+              //     scrollDirection: Axis.horizontal,
+              //     itemCount: moduleList.length,
               //     itemBuilder: (context, index) {
-              //       return ListTile(
-              //         title: Text(filteredMenuList[index].displayname ?? ""),
+              //       return Padding(
+              //         padding: const EdgeInsets.symmetric(
+              //             horizontal: 8, vertical: 16),
+              //         child: Container(
+              //           width: SizeConfig.screenWidth * 0.3,
+              //           decoration: BoxDecoration(
+              //             color: CommonColors.colorPrimary,
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           child: Center(
+              //               child: Text(moduleList[index].modulename ?? "",style: TextStyle(color: CommonColors.white, fontSize: SizeConfig.mediumTextSize),)),
+              //         ),
               //       );
               //     },
               //   ),
               // ),
+              
               Expanded(
                   child: ListView.builder(
                       itemCount: menuTypeList.length,
@@ -230,4 +269,37 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           )),
     );
   }
+  InputDecoration _inputDecoration(String hint, IconButton? suffixIcon) {
+    return InputDecoration(
+      suffixIcon: suffixIcon,
+      hintText: hint,
+      hintStyle: TextStyle(
+          color: CommonColors.grey400!, fontSize: SizeConfig.mediumTextSize),
+      contentPadding: EdgeInsets.symmetric(
+          horizontal: SizeConfig.smallHorizontalPadding,
+          vertical: SizeConfig.smallVerticalPadding),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.mediumRadius),
+        borderSide: BorderSide(color: CommonColors.grey300!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.mediumRadius),
+        borderSide: BorderSide(color: CommonColors.grey300!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.mediumRadius),
+        borderSide:
+            BorderSide(color: CommonColors.primaryColorShade!, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.mediumRadius),
+        borderSide: BorderSide(color: CommonColors.red!, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(SizeConfig.mediumRadius),
+        borderSide: BorderSide(color: CommonColors.red!, width: 1.5),
+      ),
+    );
+  }
+
 }

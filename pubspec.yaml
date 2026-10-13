@@ -92,6 +92,7 @@ dependencies:
   material_symbols_icons: ^4.2928.1
   pdf: ^3.12.0
   flutter_svg: ^2.3.0
+  webview_flutter: ^4.14.1
   
 dev_dependencies:
   flutter_test:
