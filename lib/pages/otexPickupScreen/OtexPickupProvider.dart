@@ -32,6 +32,7 @@ class OtexPickupProvider extends ChangeNotifier {
   final OtexPickupRepoImpl _repo = OtexPickupRepoImpl();
   final BaseRepository _baseRepo = BaseRepository();
   OtexPickupState get state => _state;
+  
 
   void initializeForm(
       {String? transactionId,
@@ -489,7 +490,7 @@ class OtexPickupProvider extends ChangeNotifier {
         'indentid': _state.info.indentId ?? 0,
         'documenttype': _state.info.documentType ?? '',
         'orgcode': _state.info.orgCode ?? '',
-        'orgname': _state.info.orgCode ?? '',
+        'orgname': _state.info.orgName ?? '',
         'grdt': convert2SmallDateTime(
             DateFormat('yyyy-MM-dd').format(DateTime.now())),
         'picktime': DateFormat('HH:mm').format(DateTime.now()),
@@ -608,7 +609,11 @@ class OtexPickupProvider extends ChangeNotifier {
         final updated = List<OtexPickupSplitInfo>.from(_state.splitInfo);
 
         String? newWayBillNo = response.grno;
-        if (newWayBillNo == null || newWayBillNo.isEmpty) {
+        // if (newWayBillNo == null || newWayBillNo.isEmpty) {
+        //   newWayBillNo = updated[index].wayBillNo;
+        // }
+        if (isNullOrEmpty(newWayBillNo)) {
+      
           newWayBillNo = updated[index].wayBillNo;
         }
 

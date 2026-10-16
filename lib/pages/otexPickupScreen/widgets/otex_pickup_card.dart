@@ -392,7 +392,7 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
                     ),
                   ),
                   // Show waybill inline on header when saved — user sees it collapsed
-                  if (isSaved && card.wayBillNo != null)
+                  if (isSaved && !isNullOrEmpty(card.wayBillNo))...[
                     Text(
                       "WB: ${card.wayBillNo}",
                       style: TextStyle(
@@ -401,6 +401,7 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                  ]
                 ],
               ),
             ),
