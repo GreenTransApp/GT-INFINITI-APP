@@ -183,7 +183,7 @@ class Loginrepository {
 
     try {
       CommonResponse resp =
-          await apiPost("${loginBaseUrl}ChangePassword", params);
+          await apiPost("${homeBaseUrl}ChangePasswordForLMD", params);
 
       if (resp.commandStatus != 1) {
         throw Exception(resp.commandMessage ?? "Password change failed");

@@ -252,9 +252,9 @@ class LocationTaskHandler extends TaskHandler {
         headingNorth: position.heading.toString(),
       );
 
-      await FirebaseLocationUpload()
-          .saveToServer(userData!, tripList, firebaseData);
-      _updateDriverLocation(userData!, tripList, firebaseData);
+      // await FirebaseLocationUpload()
+      //     .saveToServer(userData!, tripList, firebaseData);
+     _updateDriverLocation(userData!, tripList, firebaseData);
 
       print(
           '[ForegroundTask] Location uploaded: ${position.latitude}, ${position.longitude} → $tripList');
@@ -284,12 +284,13 @@ class LocationTaskHandler extends TaskHandler {
       "prmcompanyid": userData.companyid.toString(),
       "prmusercode": userData.usercode.toString(),
       "prmbranchcode": userData.loginbranchcode.toString(),
-      "prmboyid": userData.executiveid.toString(),
+      "prmboyid": isNullOrEmpty(userData.executiveid.toString())?0:userData.executiveid.toString(),
       "prmtripidstr": tripStr,
       "prmlatitude": firebase.latitude,
       "prmlongitude": firebase.longitude,
       "prmsessionid": userData.sessionid.toString(),
       "prmtimestamp": DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      "prmdrivercode": userData.drivercode.toString(),
       "prmheadingnorth": firebase.headingNorth
     };
     _repo.upsertDriverLocation(params);

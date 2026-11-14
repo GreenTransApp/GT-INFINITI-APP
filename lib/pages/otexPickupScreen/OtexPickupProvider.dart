@@ -474,7 +474,7 @@ class OtexPickupProvider extends ChangeNotifier {
     String currentAddress = "";
     final position = await LocationService().getCurrentLocation();
 
-    final address =  AppLocationService().getAddressFromLatLng(
+    final address =  await AppLocationService().getAddressFromLatLng(
       position.latitude,
       position.longitude,
     );

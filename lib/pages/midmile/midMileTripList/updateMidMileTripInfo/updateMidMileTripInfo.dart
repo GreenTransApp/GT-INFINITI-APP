@@ -95,7 +95,7 @@ class _UpdateMidMileTripInfoState extends State<UpdateMidMileTripInfo> {
       if (model.commandstatus == 1) {
         successToast(model.commandmessage ?? '');
         if (widget.refresh != null) {
-          widget.refresh();
+         await widget.refresh();
         }
         Get.back();
       } else {
@@ -106,7 +106,7 @@ class _UpdateMidMileTripInfoState extends State<UpdateMidMileTripInfo> {
       if (model.commandstatus == 1) {
         successToast(model.commandmessage ?? '');
         if (widget.refresh != null) {
-          widget.refresh();
+          await widget.refresh();
         }
         Get.back();
       } else {

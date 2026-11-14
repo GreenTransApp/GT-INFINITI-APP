@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:gtlmd/api/HttpCalls.dart';
 import 'package:gtlmd/base/BaseRepository.dart';
 import 'package:gtlmd/common/Utils.dart';
@@ -17,14 +18,15 @@ class LocationRepository extends BaseRepository {
     viewDialog.add(true);
     try {
       CommonResponse response =
-          await apiPost("${lmdUrl}UpdateDriverLiveLocation", params);
+          await apiPost("${lmdUrl}UpdateDriverLiveLocation_NV", params);
       // CommonResponse response =
-      //     await apiPostWithModel("${lmdUrl}UpdateDriverLiveLocation", params);
-      viewDialog.add(false);
+      //     await apiPost("${lmdUrl}UpdateDriverLiveLocation", params);
+  
       if (response.commandStatus != 1) {
-        isErrorLiveData.add(isNullOrEmpty(response.commandMessage)
-            ? "Something went wrong"
-            : response.commandMessage!);
+        debugPrint("Error in upsertDriverLocation: ${response.commandMessage}");
+        // isErrorLiveData.add(isNullOrEmpty(response.commandMessage)
+            // ? "Something went wrong"
+            // : response.commandMessage!);
         return;
       }
 
@@ -36,10 +38,12 @@ class LocationRepository extends BaseRepository {
             list.length, (index) => CommonUpdateModel.fromJson(list[index]));
         updatedLocationLiveData.add(resultList[0]);
       } catch (error) {
-        isErrorLiveData.add(error.toString());
+        // isErrorLiveData.add(error.toString());
+        debugPrint("Error parsing upsertDriverLocation response: $error");
       }
     } catch (error) {
-      isErrorLiveData.add(error.toString());
+      debugPrint("Error in upsertDriverLocation: $error");
+      // isErrorLiveData.add(error.toString());
     }
   }
 }

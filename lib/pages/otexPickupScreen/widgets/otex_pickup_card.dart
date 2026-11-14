@@ -818,17 +818,20 @@ class _OtexPickupCardState extends State<OtexPickupCard> {
             height: SizeConfig.extraSmallVerticalPadding,
           ),
          
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text("Send Whatsappp Message",style: TextStyle(fontWeight: FontWeight.bold,fontSize: SizeConfig.extraSmallTextSize)),
-            Checkbox(
-               activeColor: CommonColors.colorPrimary,
-               value: sendWhatsapp,
-               onChanged: (checked) {
-                 sendWhatsapp = checked;
-                 setState(() {}); }),
-          ],
+        Visibility(
+          visible: isNullOrEmpty(provider.state.info.issplitorder) || provider.state.info.issplitorder != 'Y',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text("Send Whatsappp Message",style: TextStyle(fontWeight: FontWeight.bold,fontSize: SizeConfig.extraSmallTextSize)),
+              Checkbox(
+                 activeColor: CommonColors.colorPrimary,
+                 value: sendWhatsapp,
+                 onChanged: (checked) {
+                   sendWhatsapp = checked;
+                   setState(() {}); }),
+            ],
+          ),
         ),
           SizedBox(
             height: SizeConfig.extraSmallVerticalPadding,

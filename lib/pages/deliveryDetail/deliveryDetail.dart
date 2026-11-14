@@ -12,6 +12,7 @@ import 'package:gtlmd/pages/deliveryDetail/Model/deliveryDetailModel.dart';
 import 'package:gtlmd/pages/deliveryDetail/Model/lmdMenuModel.dart';
 import 'package:gtlmd/pages/deliveryDetail/deliveryViewModel.dart';
 import 'package:gtlmd/pages/mapView/mapViewPage.dart';
+import 'package:gtlmd/pages/mapView/OsmMapScreen.dart';
 import 'package:gtlmd/pages/trips/tripDetail/Model/currentDeliveryModel.dart';
 import 'package:gtlmd/pages/trips/tripDetail/Model/tripModel.dart';
 import 'package:gtlmd/service/locationService/appLocationService.dart';
@@ -48,6 +49,7 @@ class _DeliveryDetailState extends State<DeliveryDetail>
   String currentdt = '';
   late DateTime todayDateTime;
   late String smallDateTime;
+  bool enableGoogleAPI = false;
 
   @override
   void initState() {
@@ -63,6 +65,21 @@ class _DeliveryDetailState extends State<DeliveryDetail>
     setObservers();
     getMenu();
     getDeliveryDetails();
+    //  Future.delayed(const Duration(seconds: 5), () {
+    getValueForGoogleMap();
+        // });
+  }
+
+  getValueForGoogleMap() async {
+    final value = await _baseRepo.returnValueFromCompAccPara({
+      "prmvarname": "GENABLEGOOGLEMAPAPI",
+      "prmcompanyid": savedLogin.companyid.toString(),
+    });
+    if (!isNullOrEmpty(value)) {
+      enableGoogleAPI = value == "Y" ? true : false;
+    } else {
+      enableGoogleAPI = false;
+    }
   }
 
   void getBookingPdf() async {
@@ -142,17 +159,23 @@ class _DeliveryDetailState extends State<DeliveryDetail>
       print(data);
     });
 
-    _subscription.add(_baseRepo.compAccPara.stream.listen((resp) {
-      debugPrint(resp);
-      setState(() {
-        if (resp.isNotEmpty && resp.contains('GTI')) {
-          menuCode = resp;
-          debugPrint('Booking Menucode ${resp}');
-        } else {
-          debugPrint('Booking Menucode Not Found');
-        }
-      });
-    }));
+    // _subscription.add(_baseRepo.compAccPara.stream.listen((resp) {
+    //   debugPrint(resp);
+    //   var value = isNullOrEmpty(resp) ? "N" : resp;
+    //   openMapScreen(value);
+    // }));
+
+    // _subscription.add(_baseRepo.compAccPara.stream.listen((resp) {
+    //   debugPrint(resp);
+    //   setState(() {
+    //     if (resp.isNotEmpty && resp.contains('GTI')) {
+    //       menuCode = resp;
+    //       debugPrint('Booking Menucode ${resp}');
+    //     } else {
+    //       debugPrint('Booking Menucode Not Found');
+    //     }
+    //   });
+    // }));
 
     _subscription.add(viewModel.updateDriverReachedLD.stream.listen((resp) {
       if (resp.commandstatus == 1) {
@@ -213,8 +236,7 @@ class _DeliveryDetailState extends State<DeliveryDetail>
   }
 
   Future<void> updateDriverReached(
-      String grno, String indentId, String tripid,String jobid) async {
-   
+      String grno, String indentId, String tripid, String jobid) async {
     loadingAlertService.showLoading();
 
     try {
@@ -224,14 +246,14 @@ class _DeliveryDetailState extends State<DeliveryDetail>
       //     distanceFilter: 0,
       //   ),
       // ).timeout(const Duration(seconds: 15));
-      
-    final position = await LocationService().getCurrentLocation();
 
-    // final address = await AppLocationService().getAddressFromLatLng(
-    //   position.latitude,
-    //   position.longitude,
-    // );
- 
+      final position = await LocationService().getCurrentLocation();
+
+      // final address = await AppLocationService().getAddressFromLatLng(
+      //   position.latitude,
+      //   position.longitude,
+      // );
+
       Map<String, dynamic> params = {
         "prmusercode": savedUser.usercode.toString(),
         "prmbranchcode": savedUser.loginbranchcode.toString(),
@@ -240,16 +262,16 @@ class _DeliveryDetailState extends State<DeliveryDetail>
         "prmindentid": indentId,
         "prmreachedlat": position.latitude.toString(),
         "prmreachedlong": position.longitude.toString(),
-        "prmjobid":isNullOrEmpty(jobid) ? "" : int.parse(jobid),
+        "prmjobid": isNullOrEmpty(jobid) ? "" : int.parse(jobid),
         "prmsessionid": savedUser.sessionid.toString(),
       };
 
       printParams(params);
       viewModel.updateDriverReached(params);
-    }catch(e, stackTrace) {
-    print("updateDriverReached ERROR: $e");
-    print(stackTrace);
-} finally {
+    } catch (e, stackTrace) {
+      print("updateDriverReached ERROR: $e");
+      print(stackTrace);
+    } finally {
       loadingAlertService.hideLoading();
     }
   }
@@ -285,7 +307,8 @@ class _DeliveryDetailState extends State<DeliveryDetail>
     }
   }
 
-  Future<void> updatePickupDepartedPosition(String grno, String tripid,String jobid) async {
+  Future<void> updatePickupDepartedPosition(
+      String grno, String tripid, String jobid) async {
     loadingAlertService.showLoading();
 
     try {
@@ -315,15 +338,15 @@ class _DeliveryDetailState extends State<DeliveryDetail>
     }
   }
 
-  getBookingMenuCodeFromCompAccPara() {
-    Map<String, String> params = {
-      "prmvarname": "GLMDBOOKINGMENUCODE",
-      "prmcompanyid": savedLogin.companyid.toString(),
-    };
+  // getBookingMenuCodeFromCompAccPara() {
+  //   Map<String, String> params = {
+  //     "prmvarname": "GLMDBOOKINGMENUCODE",
+  //     "prmcompanyid": savedLogin.companyid.toString(),
+  //   };
 
-    printParams(params);
-    _baseRepo.getValueFromCompAccPara(params);
-  }
+  //   printParams(params);
+  //   _baseRepo.getValueFromCompAccPara(params);
+  // }
 
   // filterList(Filter filter) {
   //   switch (filter) {
@@ -378,10 +401,20 @@ class _DeliveryDetailState extends State<DeliveryDetail>
             )),
         actions: [
           InkWell(
-            onTap: () {
-              Get.to(MapViewPage(
-                model: widget.tripModel,
-              ));
+            onTap: () async {
+              // Get.to(OsmMapScreen(
+              //   model: widget.tripModel,
+              // ));
+              // Get.to(MapViewPage(
+              //   model: widget.tripModel,
+              // ));
+
+             
+               if (enableGoogleAPI) {
+                await Get.to(() => MapViewPage(model: widget.tripModel));
+              } else {
+               await Get.to( () => OsmMapScreen(model: widget.tripModel),);
+              }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -428,7 +461,7 @@ class _DeliveryDetailState extends State<DeliveryDetail>
                       //             const RelativeRect.fromLTRB(1, 120, 0.5, 0),
                       //         popUpAnimationStyle: const AnimationStyle(
                       //             curve: Curves.easeInCirc,
-                                  
+
                       //             ),
                       //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       //         items: [

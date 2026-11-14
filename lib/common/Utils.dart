@@ -41,6 +41,7 @@ import 'commonModel/allFormLoadModel.dart';
 const METHOD_CHANNEL = MethodChannel('com.map_api_key.flutter');
 //  String GOOGLE_MAPS_API_KEY = "AIzaSyBAVL3a5xqVrQOnkvQbs8cgJ-V2tLnpb3E"; //jeena biker  api key
 String GOOGLE_MAPS_API_KEY = "";
+bool ENABLE_GOOGLE_MAPS = false;
 // String GOOGLE_MAPS_API_KEY = "";
 
 // String toDatePicker;
@@ -824,6 +825,83 @@ Future<List<int>> fetchTotalRouteDistance(
   }
 }
 
+
+Future<List<int>> fetchTotalRouteDistanceWithOSM(
+  List<dynamic> routeDetail,
+  MapConfigJsonModel mapconfig,
+) async {
+  final List<int> updatedDistances = [];
+
+  // At least two locations are required.
+  if (routeDetail.length < 2) {
+    debugPrint('At least two route locations are required.');
+    return [];
+  }
+
+  try {
+    // OSRM requires coordinates in longitude,latitude order.
+    final List<String> coordinates = [];
+
+    for (final item in routeDetail) {
+      final lat = item.deliverylat;
+      final lng = item.deliverylong;
+
+      if (lat == null || lng == null) {
+        debugPrint('A route location has missing coordinates.');
+        return [];
+      }
+
+      coordinates.add('$lng,$lat');
+    }
+
+    final url = Uri.parse(
+  'https://router.project-osrm.org/route/v1/driving/'
+  '${coordinates.join(';')}?overview=full&geometries=geojson&steps=true',
+);
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      debugPrint('OSRM HTTP error: ${response.statusCode}');
+      debugPrint(response.body);
+      return [];
+    }
+
+    final data = json.decode(response.body);
+
+    if (data['code'] != 'Ok' ||
+        data['routes'] == null ||
+        (data['routes'] as List).isEmpty) {
+      debugPrint('OSRM route error: ${data['code']}');
+      return [];
+    }
+
+    final route = data['routes'][0];
+
+    // Total distance in meters.
+    final int totalDistanceInMeters =
+        (route['distance'] as num).round();
+
+    // Individual leg distances in meters.
+    for (final leg in route['legs']) {
+      updatedDistances.add(
+        (leg['distance'] as num).round(),
+      );
+    }
+
+    // Preserve the existing return structure.
+    updatedDistances.insert(0, totalDistanceInMeters);
+
+    debugPrint(
+      'Total route distance: $totalDistanceInMeters meters',
+    );
+
+    return updatedDistances;
+  } catch (e) {
+    debugPrint('Error calculating route distance: $e');
+    return [];
+  }
+}
+  
 Future<bool> requestAppPermission(Permission permission,
     {String? reason}) async {
   try {

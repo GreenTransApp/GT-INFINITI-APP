@@ -913,20 +913,20 @@ class _TripORdersSummaryState extends State<TripORdersSummary> {
                                 ? 'N/A'
                                 : ordersList.manifests.first.totalWeight
                                     .toString()),
-                        _buildDetailRow(
-                            'Delivered',
-                            isNullOrEmpty(ordersList.manifests.first.delivered
-                                    .toString())
-                                ? 'N/A'
-                                : ordersList.manifests.first.delivered
-                                    .toString()),
-                        _buildDetailRow(
-                            'Pending',
-                            isNullOrEmpty(ordersList.manifests.first.pending
-                                    .toString())
-                                ? 'N/A'
-                                : ordersList.manifests.first.pending
-                                    .toString()),
+                        // _buildDetailRow(
+                        //     'Delivered',
+                        //     isNullOrEmpty(ordersList.manifests.first.delivered
+                        //             .toString())
+                        //         ? 'N/A'
+                        //         : ordersList.manifests.first.delivered
+                        //             .toString()),
+                        // _buildDetailRow(
+                        //     'Pending',
+                        //     isNullOrEmpty(ordersList.manifests.first.pending
+                        //             .toString())
+                        //         ? 'N/A'
+                        //         : ordersList.manifests.first.pending
+                        //             .toString()),
                       ],
                     ),
                     _buildAccordionSection(

@@ -59,6 +59,7 @@ class DeliveryDetailModel {
   String? cngrname;
   String? cngraddress;
   String? cngrmobileno;
+  String? issplitorder;
   
 
   DeliveryDetailModel(
@@ -119,6 +120,7 @@ class DeliveryDetailModel {
        this.cngrname,
        this.cngraddress,
        this.cngrmobileno,
+       this.issplitorder,
       });
 
   factory DeliveryDetailModel.fromJson(Map<String, dynamic> json) {
@@ -180,6 +182,7 @@ class DeliveryDetailModel {
       cngrname: json['cngrname'],
       cngraddress: json['cngraddress'],
       cngrmobileno: json['cngrmobileno'],
+      issplitorder: json['issplitorder'],
     );
   }
 
@@ -242,6 +245,8 @@ class DeliveryDetailModel {
       'cngrname': cngrname,
       'cngraddress': cngraddress,
       'cngrmobileno': cngrmobileno,
+      'issplitorder': issplitorder,
+    
     };
   }
 }

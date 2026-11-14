@@ -83,7 +83,7 @@ class _MapViewPageState extends State<MapViewPage> {
   setObservers() {
     _baseRepo.accResp.stream.listen((resp) async {
       if (isNullOrEmpty(resp)) {
-        failToast("Unable To Fetch Google Map Api key, plese Try Again.");
+        failToast("Unable To Fetch Google Map Api key, please Try Again.");
       } else {
         GOOGLE_MAPS_API_KEY = resp;
       }

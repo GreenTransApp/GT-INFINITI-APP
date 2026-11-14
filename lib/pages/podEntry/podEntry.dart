@@ -112,7 +112,7 @@ class _PodEntryState extends State<PodEntry> {
   late String currentdate;
   late String currentTime;
   bool isGrEditable = false;
- Position? position;
+  Position? position;
 
   @override
   void initState() {
@@ -174,7 +174,7 @@ class _PodEntryState extends State<PodEntry> {
 
   Future<void> fetchLocationAndSubmit() async {
     loadingAlertService.showLoading();
-     position = await LocationService().getCurrentLocation();
+    position = await LocationService().getCurrentLocation();
 
     final address = await AppLocationService().getAddressFromLatLng(
       position!.latitude,
@@ -222,28 +222,32 @@ class _PodEntryState extends State<PodEntry> {
     _originNameController.text = isNullOrEmpty(pod.origin.toString())
         ? "Data Not Found"
         : pod.origin.toString();
-    _destinationNameController.text =
-        isNullOrEmpty(pod.destname.toString())
-            ? "Data Not Found"
-            : pod.destname.toString();
+    _destinationNameController.text = isNullOrEmpty(pod.destname.toString())
+        ? "Data Not Found"
+        : pod.destname.toString();
     _bookingDateController.text =
         isNullOrEmpty(pod.grdt.toString()) ? "" : pod.grdt.toString();
-    _bookingTimeController.text = isNullOrEmpty(pod.picktime.toString()) 
-        ? ""
-        : pod.picktime.toString();
+    _bookingTimeController.text =
+        isNullOrEmpty(pod.picktime.toString()) ? "" : pod.picktime.toString();
     _arrivalDateController.text = isNullOrEmpty(pod.receivedt)
         ? DateFormat('dd-MM-yyyy').format(DateTime.now())
         : pod.receivedt.toString();
-    _arrivalTimeController.text = isNullOrEmpty(pod.receivetime) 
+    _arrivalTimeController.text = isNullOrEmpty(pod.receivetime)
         ? "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}"
         : pod.receivetime.toString();
     _destinationNameController.text = pod.destname.toString();
-    _receivedByController.text =isNullOrEmpty(pod.cnge.toString()) ? "" : pod.cnge.toString();
-    _receiverMobileByController.text = isNullOrEmpty(_receiverMobileByController.text) ?isNullOrEmpty(pod.cngetelno.toString())?"" :pod.cngetelno.toString() :_receiverMobileByController.text;
+    _receivedByController.text =
+        isNullOrEmpty(pod.cnge.toString()) ? "" : pod.cnge.toString();
+    _receiverMobileByController.text =
+        isNullOrEmpty(_receiverMobileByController.text)
+            ? isNullOrEmpty(pod.cngetelno.toString())
+                ? ""
+                : pod.cngetelno.toString()
+            : _receiverMobileByController.text;
 
     isSignRequired = pod.sign == "Y" ? true : false;
     isStampRequired = pod.stamp == "Y" ? true : false;
-  
+
     _totalWeightController.text = '${pod.cweight.toString()} Kg';
 
     _totalPckgsController.text = pod.pckgs.toString() ?? "0";
@@ -494,8 +498,9 @@ class _PodEntryState extends State<PodEntry> {
       failToast("Please enter delivery packages");
       return;
     } else if (isNullOrEmpty(_damagedPckgsController.text)) {
-      failToast("Please enter damaged packages");
-      return;
+      _damagedPckgsController.text = "0";
+      // failToast("Please enter damaged packages");
+      // return;
     } else if (int.parse(_deliverPckgsController.text) >
         int.parse(model.pckgs.toString())) {
       failToast("Delivery packages cannot be greater than total packages");
@@ -532,20 +537,16 @@ class _PodEntryState extends State<PodEntry> {
     String damageImagesBase64 = "";
     List<String> damageBase64ImgList = [];
     for (String image in _damageImages) {
-    
       damageBase64ImgList.add(convertFilePathToBase64(image));
     }
     damageImagesBase64 = damageBase64ImgList.join(',');
 
-
     String deliveryImagesBase64 = "";
     List<String> DeliveryBase64Images = [];
     for (String image in _deliveryNoteImages) {
-    
       DeliveryBase64Images.add(convertFilePathToBase64(image));
     }
     deliveryImagesBase64 = DeliveryBase64Images.join(',');
-
 
     // String damageImgpdfPath = await convertImagesToPdf(_damageImages);
     // String deliveryImgpdfPath = await convertImagesToPdf(_deliveryNoteImages);
@@ -586,11 +587,13 @@ class _PodEntryState extends State<PodEntry> {
           : _selectedDamageReason!.reasoncode,
       // "prmdamageimgstr": damageImageList,
       // "prmdamageimagestr": convertFilePathToBase64(damageImgpdfPath),
-      "prmdamageimagestr": isNullOrEmpty(damageImagesBase64)? null:damageImagesBase64,
+      "prmdamageimagestr":
+          isNullOrEmpty(damageImagesBase64) ? null : damageImagesBase64,
       // "prmdeliveryimgpath": convertFilePathToBase64(deliveryImgpdfPath),
-      "prmdeliveryimgpath": isNullOrEmpty(deliveryImagesBase64)? null:deliveryImagesBase64,
+      "prmdeliveryimgpath":
+          isNullOrEmpty(deliveryImagesBase64) ? null : deliveryImagesBase64,
       "prmentrylocation": currentAddress,
-      "prmentrylocationlat": position?.latitude.toString()?? "",
+      "prmentrylocationlat": position?.latitude.toString() ?? "",
       "prmentrylocationlong": position?.longitude.toString() ?? "",
     };
 
@@ -1291,7 +1294,8 @@ class _PodEntryState extends State<PodEntry> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal:
                                               SizeConfig.smallHorizontalPadding,
-                                          vertical: SizeConfig.smallVerticalPadding),
+                                          vertical:
+                                              SizeConfig.smallVerticalPadding),
                                       decoration: BoxDecoration(
                                         border: Border.all(
                                             color: CommonColors.grey300!),
@@ -1330,7 +1334,8 @@ class _PodEntryState extends State<PodEntry> {
                                     padding: EdgeInsets.symmetric(
                                         horizontal:
                                             SizeConfig.smallHorizontalPadding,
-                                        vertical: SizeConfig.smallVerticalPadding),
+                                        vertical:
+                                            SizeConfig.smallVerticalPadding),
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                           color: CommonColors.grey300!),
@@ -1595,18 +1600,18 @@ class _PodEntryState extends State<PodEntry> {
                               },
                               onChanged: (value) {
                                 _damagedPckgsController.text = value;
-                                  
-                                  if (_damagedPckgsController.text
-                                          .toString()
-                                          .isNotEmpty &&
-                                      int.parse(_damagedPckgsController.text
-                                              .toString()) == 0) {
-                                    // empty the damage reason, damage image 1 and damage image 2 variables
-                                    clearDamagedValues();
-                                  }
-                                
-                                setState(() {
-                                });
+
+                                if (_damagedPckgsController.text
+                                        .toString()
+                                        .isNotEmpty &&
+                                    int.parse(_damagedPckgsController.text
+                                            .toString()) ==
+                                        0) {
+                                  // empty the damage reason, damage image 1 and damage image 2 variables
+                                  clearDamagedValues();
+                                }
+
+                                setState(() {});
                               },
                               controller: _damagedPckgsController,
                               // keyboardType: TextInputType.phone,
@@ -2134,7 +2139,8 @@ class _PodEntryState extends State<PodEntry> {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: SizeConfig.smallHorizontalPadding,
+                                      horizontal:
+                                          SizeConfig.smallHorizontalPadding,
                                       vertical:
                                           SizeConfig.smallVerticalPadding),
                                   child: Text.rich(TextSpan(
@@ -2241,7 +2247,7 @@ class _PodEntryState extends State<PodEntry> {
                                           width: 1,
                                           color: CommonColors.colorPrimary!),
                                     ),
-                                    child:isNullOrEmpty(_podFilePath) 
+                                    child: isNullOrEmpty(_podFilePath)
                                         ? Center(
                                             child: Text(
                                               "Select Image",

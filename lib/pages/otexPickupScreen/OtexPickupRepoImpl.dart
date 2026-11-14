@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:gtlmd/api/HttpCalls.dart';
+import 'package:gtlmd/common/Environment.dart';
 import 'package:gtlmd/common/commonResponse.dart';
 import 'package:gtlmd/optionMenu/operations/models/operationsModel.dart';
 import 'package:gtlmd/pages/otexPickupScreen/models/OtexPickupInfoModel.dart';
@@ -309,10 +310,11 @@ class OtexPickupRepoImpl {
 
     try {
       //  CommonResponse resp =
-          // await apiPostWithModel("${lmdUrl}UpsertOtexPickup_V2", params);
-
+      // await apiPostWithModel("${lmdUrl}UpsertOtexPickup_V2", params);
+      var apiname = ENV.isDebugging ? "" : "UpsertOtexPickup";
+      apiname = "UpsertOtexPickup";
       CommonResponse resp =
-          await apiPostWithModel("${lmdUrl}UpsertOtexPickup", params);
+          await apiPostWithModel("${lmdUrl}${apiname}", params);
 
       if (resp.commandStatus == 1) {
         Map<String, dynamic> table = jsonDecode(resp.dataSet.toString());
@@ -348,7 +350,7 @@ class OtexPickupRepoImpl {
       Iterable<MapEntry<String, dynamic>> entries = table.entries;
       OtexPickupInfoModel infoModel = OtexPickupInfoModel();
       List<OtexPickupSplitInfo> splitInfo = [];
-    
+
       for (final entry in entries) {
         if (entry.key == 'Table' || entry.key == 'Table1') {
           List<dynamic> list = entry.value;
@@ -361,7 +363,7 @@ class OtexPickupRepoImpl {
           List<dynamic> list = entry.value;
           splitInfo = List.generate(list.length,
               (index) => OtexPickupSplitInfo.fromJson(list[index]));
-        } 
+        }
       }
       List<dynamic> result = [];
       result.add(infoModel);
@@ -370,7 +372,7 @@ class OtexPickupRepoImpl {
       } else {
         result.add(const OtexPickupSplitInfo());
       }
-      
+
       // }
       return result;
     } on SocketException catch (_) {

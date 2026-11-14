@@ -534,7 +534,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                         },
                         itemBuilder: (context) => [
                           if (widget.model.consignmenttype == 'P' &&
-                              status == 'Picked')
+                              status == 'Picked' && isNullOrEmpty(widget.model.issplitorder) || widget.model.issplitorder != 'Y')
                             const PopupMenuItem(
                               value: 'enquiry',
                               child: Row(
@@ -551,7 +551,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                               ),
                             ),
                           if (widget.model.consignmenttype == 'P' &&
-                              status == 'Picked')
+                              status == 'Picked' && widget.model.issplitorder == 'N')
                             const PopupMenuItem(
                               value: 'share',
                               child: Row(
@@ -606,107 +606,57 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              // Row(
-                              //   children: [
-                              //     Visibility(
-                              //       visible: widget.model.reached == 'N',
-                              //       child: GestureDetector(
-                              //         onTap: () {
-                              //           updateDriverReached();
-                              //         },
-                              //         child: Row(
-                              //           mainAxisAlignment:
-                              //               MainAxisAlignment.spaceEvenly,
-                              //           children: [
-                              //             Container(
-                              //               margin: EdgeInsets.only(
-                              //                   right: SizeConfig
-                              //                       .horizontalPadding),
-                              //               padding: EdgeInsets.symmetric(
-                              //                 horizontal: SizeConfig
-                              //                     .smallHorizontalSpacing,
-                              //                 vertical: 5,
-                              //               ),
-                              //               decoration: BoxDecoration(
-                              //                   color:
-                              //                       CommonColors.colorPrimary2!,
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(16)),
-                              //               child: Text(
-                              //                 "Pending",
-                              //                 style: TextStyle(
-                              //                     fontWeight: FontWeight.w600,
-                              //                     fontSize:SizeConfig.extraSmallTextSize,
-                              //                     color: CommonColors.white),
-                              //               ),
-                              //             ),
-                              //             Container(
-                              //               padding: EdgeInsets.symmetric(
-                              //                 horizontal: SizeConfig
-                              //                     .extraSmallHorizontalSpacing,
-                              //                 vertical: 4,
-                              //               ),
-                              //               decoration: BoxDecoration(
-                              //                   color: CommonColors.white!,
-                              //                   border: Border.all(
-                              //                       color:
-                              //                           CommonColors.grey400!),
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(16)),
-                              //               child:  Row(
-                              //                 children: [
-                              //                    Icon(
-                              //     Icons.circle,
-                              //     color: CommonColors.colorPrimary2,
-                              //     size: SizeConfig.extraSmallIconSize,
-                              //   ),
-                              //                   Text(
-                              //                     "Arrived At",
-                              //                     style: TextStyle(
-                              //                         fontWeight: FontWeight.w600,
-                              //                         fontSize: SizeConfig.extraSmallTextSize,
-                              //                         color:
-                              //                             CommonColors.appBarColor),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     Visibility(
-                              //       visible: widget.model.reached == 'Y',
-                              //       child: Row(
-                              //         children: [
-                              //           Icon(
-                              //             Icons.check_circle,
-                              //             color: CommonColors.green600,
-                              //           ),
-                              //           const SizedBox(
-                              //             width: 8,
-                              //           ),
-                              //           const Text("Reached")
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
-                              // SizedBox(
-                              //   height: SizeConfig.smallVerticalSpacing,
-                              // ),
-                              isNullOrEmpty(modelDetail.undeliverreason)
-                                  ? const SizedBox.shrink()
-                                  : Text(
-                                      'Reason: ${modelDetail.undeliverreason}',
-                                      style: TextStyle(
-                                        fontSize: SizeConfig.smallTextSize,
-                                        fontWeight: FontWeight.w800,
-                                        color: cardHeaderColor,
-                                      )),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  isNullOrEmpty(modelDetail.undeliverreason)
+                                      ? const SizedBox.shrink()
+                                      : Text(
+                                          'Reason: ${modelDetail.undeliverreason}',
+                                          style: TextStyle(
+                                            fontSize: SizeConfig.smallTextSize,
+                                            fontWeight: FontWeight.w800,
+                                            color: cardHeaderColor,
+                                          )),
+                                ],
+                              ),
+                               Visibility(
+                                visible: widget.model.consignmenttype == 'P' && widget.model.issplitorder == 'Y',
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        SizeConfig.extraSmallHorizontalSpacing,
+                                    vertical: 4,
+                                  ),
+                                  margin: EdgeInsets.only(left: SizeConfig.extraSmallHorizontalSpacing),
+                                  decoration: BoxDecoration(
+                                    color: CommonColors.colorPrimary2,
+                                      border: Border.all(color: CommonColors.white??Colors.black),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20))),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_outline_rounded,
+                                        color: CommonColors.white,
+                                        size: SizeConfig.extraSmallIconSize,
+                                      ),
+                                      Text(
+                                       "Split Order",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color:  CommonColors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
                             ],
                           ),
                           Container(
@@ -715,6 +665,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                                   SizeConfig.extraSmallHorizontalSpacing,
                               vertical: 4,
                             ),
+
                             decoration: BoxDecoration(
                                 border: Border.all(color: cardHeaderColor),
                                 borderRadius:
@@ -737,7 +688,8 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                               ],
                             ),
                           ),
-                        ],
+
+                          ],
                       ),
 
                       // SizedBox(height: SizeConfig.smallVerticalSpacing),
@@ -747,6 +699,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                         padding: EdgeInsets.symmetric(
                             horizontal: SizeConfig.smallHorizontalPadding,
                             vertical: SizeConfig.extraSmallVerticalPadding),
+                        margin: EdgeInsets.only(top: SizeConfig.extraSmallVerticalSpacing),
                         decoration: BoxDecoration(
                           color: CommonColors.white,
                           borderRadius: BorderRadius.circular(12),

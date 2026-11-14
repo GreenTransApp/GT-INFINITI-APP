@@ -20,6 +20,7 @@ class BaseRepository {
   StreamController<String> isErrorLiveData = StreamController();
   StreamController<String> accResp = StreamController();
   StreamController<String> compAccPara = StreamController();
+// StreamController<String> compAccPara = StreamController<String>.broadcast();
   StreamController<MapConfigDetailModel> mapConfigDetail = StreamController();
   StreamController<CommonUpdateModel> sendAlertResp = StreamController();
   StreamController<String> scannedCode = StreamController();
@@ -92,8 +93,9 @@ class BaseRepository {
           isErrorLiveData.add(resp.commandMessage ?? "Unknown error");
         }
       } catch (err) {
+        viewDialog.add(false);
         isErrorLiveData.add("Exception: ${err.toString()}");
-      } finally {
+       } finally {
         viewDialog.add(false);
       }
     } else {
@@ -101,6 +103,10 @@ class BaseRepository {
       isErrorLiveData.add("No Internet available");
     }
   }
+
+
+  
+
 
   Future<void> getMapConfig(Map<String, String> params) async {
     viewDialog.add(true);
@@ -279,4 +285,38 @@ class BaseRepository {
     }
     return '';
   }
+  Future<String?> returnValueFromCompAccPara(
+    Map<String, String> params) async {
+  // viewDialog.add(true);
+
+  try {
+    final hasInternet =
+        await NetworkStatusService().hasConnection;
+
+    if (!hasInternet) {
+      // isErrorLiveData.add("No Internet available");
+      return null;
+    }
+
+    CommonResponse resp = await apiGet(
+        "${bookingUrl}GetValueFromCompAccPara", params);
+
+    final rawMessage = resp.message?.toString() ?? "";
+
+    debugPrint("Raw response message: $rawMessage");
+
+    if (resp.commandStatus == 1) {
+      return rawMessage;
+    }
+
+    // isErrorLiveData.add(
+    //     resp.commandMessage ?? "Unknown error");
+    return null;
+  } catch (err) {
+    // isErrorLiveData.add("Exception: $err");
+    return null;
+  } finally {
+    // viewDialog.add(false);
+  }
+}
 }

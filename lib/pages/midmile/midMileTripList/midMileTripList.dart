@@ -112,7 +112,7 @@ class MidMileTripListState extends State<MidMileTripList> {
         filterList.clear();
       }
     });
-     viewModel.validateTripLiveData.stream.listen((resp) {
+    viewModel.validateTripLiveData.stream.listen((resp) {
       if (resp.commandstatus == 1) {
         startTrip(resp);
       } else {
@@ -177,7 +177,8 @@ class MidMileTripListState extends State<MidMileTripList> {
     };
     await viewModel.getMidMileTripsList(params);
   }
-   Future<void> _ValidateTripBeforeStart(MidMileTripListModel trip) async {
+
+  Future<void> _ValidateTripBeforeStart(MidMileTripListModel trip) async {
     Map<String, String> params = {
       "prmusercode": savedUser.usercode.toString(),
       "prmtripid": trip.tripid.toString(),
@@ -190,11 +191,14 @@ class MidMileTripListState extends State<MidMileTripList> {
   }
 
   startTrip(MidMileTripListModel trip) {
-    openUpdateMidMileTripInfo(context, trip, onRefresh,MidMileTripStatus.START_TRIP);
+    openUpdateMidMileTripInfo(
+        context, trip, onRefresh, MidMileTripStatus.START_TRIP);
   }
 
   closeTrip(MidMileTripListModel trip) {
-    openUpdateMidMileTripInfo(context, trip, onRefresh,MidMileTripStatus.CLOSE_TRIP);
+    openUpdateMidMileTripInfo(
+        context, trip, onRefresh, MidMileTripStatus.CLOSE_TRIP);
+      
   }
 
   Widget _infoTile(IconData icon, String title, String value) {
@@ -203,7 +207,8 @@ class MidMileTripListState extends State<MidMileTripList> {
       children: [
         CircleAvatar(
           radius: 15,
-          backgroundColor: CommonColors.colorPrimary!.withAlpha((0.2 * 255).toInt()),
+          backgroundColor:
+              CommonColors.colorPrimary!.withAlpha((0.2 * 255).toInt()),
           child: Icon(
             icon,
             size: 18,
@@ -242,23 +247,23 @@ class MidMileTripListState extends State<MidMileTripList> {
         if (trip.tripstart == 'Y') {
           // Get.to(MidMileTripDetail(
           //     tripid: trip.tripid!, tripdetailid: trip.tripdetailid!));
-           Get.to(() => MidMileTripDetail(
-         tripid: trip.tripid!, tripdetailid: trip.tripdetailid!)
-        )?.then((_) {
-      authService.validateDevice(context);
-    });
-        }else{
+          Get.to(() => MidMileTripDetail(
+              tripid: trip.tripid!,
+              tripdetailid: trip.tripdetailid!))?.then((_) {
+            onRefresh();
+            authService.validateDevice(context);
+          });
+        } else {
           failToast("Please start the trip to view details");
         }
       },
       child: Card(
-        color:CommonColors.white!,
+          color: CommonColors.white!,
           elevation: 3,
           margin: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 6,
           ),
-          
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(SizeConfig.largeRadius),
           ),
@@ -267,56 +272,68 @@ class MidMileTripListState extends State<MidMileTripList> {
             children: [
               /// Header
               Container(
-                padding: EdgeInsets.symmetric(vertical: SizeConfig.verticalPadding,horizontal: SizeConfig.horizontalPadding),
+                padding: EdgeInsets.symmetric(
+                    vertical: SizeConfig.verticalPadding,
+                    horizontal: SizeConfig.horizontalPadding),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(SizeConfig.largeRadius),topRight: Radius.circular(SizeConfig.largeRadius)),
-                 gradient: RadialGradient(
-                   radius: 7,
-                  colors: [CommonColors.colorPrimary!.withAlpha(( 0.2*255 ).toInt()), CommonColors.white!])
-              ),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(SizeConfig.largeRadius),
+                        topRight: Radius.circular(SizeConfig.largeRadius)),
+                    gradient: RadialGradient(radius: 7, colors: [
+                      CommonColors.colorPrimary!.withAlpha((0.2 * 255).toInt()),
+                      CommonColors.white!
+                    ])),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start
-                  ,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: SizeConfig.extraSmallHorizontalPadding),
-                      decoration: BoxDecoration(color: CommonColors.white,
-                      border: Border.all(color: CommonColors.colorPrimary!,width: 0.2),
-                      borderRadius: BorderRadius.all(Radius.circular(SizeConfig.smallRadius))
-                      ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: SizeConfig.extraSmallHorizontalPadding),
+                      decoration: BoxDecoration(
+                          color: CommonColors.white,
+                          border: Border.all(
+                              color: CommonColors.colorPrimary!, width: 0.2),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(SizeConfig.smallRadius))),
                       child: Text(
                         "Trip ID : ${trip.tripid}",
-                        style:  TextStyle(
+                        style: TextStyle(
                           fontSize: SizeConfig.smallTextSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: SizeConfig.extraSmallHorizontalPadding),
-                      decoration: BoxDecoration(color: CommonColors.white,
-                      border: Border.all(color: CommonColors.colorPrimary!,width: 0.2),
-                      borderRadius: BorderRadius.all(Radius.circular(SizeConfig.smallRadius))),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: SizeConfig.extraSmallHorizontalPadding),
+                      decoration: BoxDecoration(
+                          color: CommonColors.white,
+                          border: Border.all(
+                              color: CommonColors.colorPrimary!, width: 0.2),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(SizeConfig.smallRadius))),
                       child: Text(
                         "Trip Detail ID : ${trip.tripdetailid}",
-                        style:  TextStyle(
+                        style: TextStyle(
                           fontSize: SizeConfig.smallTextSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                   
                   ],
                 ),
               ),
-          
+
               const SizedBox(height: 16),
-          
+
               /// Origin -> Destination
               Container(
-                padding: EdgeInsets.symmetric(vertical: SizeConfig.verticalPadding,horizontal: SizeConfig.smallHorizontalPadding),
-                margin: EdgeInsets.symmetric(horizontal: SizeConfig.extraSmallHorizontalSpacing),
+                padding: EdgeInsets.symmetric(
+                    vertical: SizeConfig.verticalPadding,
+                    horizontal: SizeConfig.smallHorizontalPadding),
+                margin: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.extraSmallHorizontalSpacing),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10),
@@ -340,7 +357,6 @@ class MidMileTripListState extends State<MidMileTripList> {
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Icon(Icons.arrow_forward),
                     ),
-                    
                     Expanded(
                       child: Text(
                         trip.destination ?? "-",
@@ -358,12 +374,13 @@ class MidMileTripListState extends State<MidMileTripList> {
                   ],
                 ),
               ),
-          
+
               const SizedBox(height: 14),
-          
+
               /// Details
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: SizeConfig.smallHorizontalPadding),
+                padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.smallHorizontalPadding),
                 child: Row(
                   children: [
                     Expanded(
@@ -378,23 +395,21 @@ class MidMileTripListState extends State<MidMileTripList> {
                       child: _infoTile(Icons.speed, "Vehicle Start KM",
                           "${trip.vehiclestartkm.toString()} km"),
                     ),
-                    
                   ],
                 ),
               ),
-               const SizedBox(height: 10),
+              const SizedBox(height: 10),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: SizeConfig.smallHorizontalPadding),
+                padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.smallHorizontalPadding),
                 child: Row(
                   children: [
-                  Expanded(
+                    Expanded(
                       child: _infoTile(Icons.badge_outlined, "Placement",
                           trip.placementid.toString()),
                     ),
-                    
                     const SizedBox(width: 12),
-                  
-                     Expanded(
+                    Expanded(
                       child: _infoTile(
                         Icons.phone,
                         "Mobile",
@@ -404,176 +419,185 @@ class MidMileTripListState extends State<MidMileTripList> {
                   ],
                 ),
               ),
-          
+
               const SizedBox(height: 10),
-          
-                
-                if (trip.tripstart == 'N')... [
-                 // InkWell(
-                 //   onTap: () => startTrip(trip),
-                 //   borderRadius: BorderRadius.circular(8),
-                 //   child: Container(
-                     
-                 //     padding: EdgeInsets.symmetric(
-                 //       horizontal: SizeConfig.mediumHorizontalSpacing,
-                 //       vertical: SizeConfig.smallVerticalSpacing,
-                 //     ),
-                 //     decoration: BoxDecoration(
-                 //       color: CommonColors.colorPrimary,
-                 //       borderRadius: BorderRadius.circular(8),
-                 //     ),
-                 //     child: Row(
-                 //       mainAxisSize: MainAxisSize.min,
-                 //       children: [
-                 //         Icon(
-                 //           Icons.play_arrow_rounded,
-                 //           color: Colors.white,
-                 //           size: SizeConfig.extraLargeIconSize,
-                 //         ),
-                 //         const SizedBox(width: 6),
-                 //         const Text(
-                 //           "Start Trip",
-                 //           style: TextStyle(
-                 //             color: Colors.white,
-                 //             fontWeight: FontWeight.w600,
-                 //           ),
-                 //         ),
-                 //       ],
-                 //     ),
-                 //   ),
-                 // ),
-                
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: SizeConfig.extraSmallHorizontalPadding,vertical: SizeConfig.verticalPadding),
-                             decoration: BoxDecoration(
-                             borderRadius: BorderRadius.circular(SizeConfig.smallRadius),
-                             gradient: LinearGradient(
-                                 colors: [CommonColors.red600!, CommonColors.colorPrimary!])),
-                           width: double.infinity,
-                           child: ElevatedButton(
-                            //  onPressed:() => startTrip(trip),
-                             onPressed:() => _ValidateTripBeforeStart(trip),
-                             style: ElevatedButton.styleFrom(
-                               // backgroundColor: CommonColors.colorPrimary,
-                               // foregroundColor: CommonColors.White,
-                               backgroundColor: Colors.transparent,
-                               shadowColor: Colors.transparent,
-                               disabledBackgroundColor: CommonColors.grey300,
-                               padding: const EdgeInsets.symmetric(vertical: 12),
-                               shape: RoundedRectangleBorder(
-                                 borderRadius: BorderRadius.circular(18),
-                               ),
-                             ), // Disable if not punched in
-                             child: Row(
-                                     mainAxisAlignment: MainAxisAlignment.center,
-                                     children: [
-                                       Icon(
-                                         Icons.play_arrow_rounded,
-                                         size: SizeConfig.largeIconSize,
-                                         color: CommonColors.white,
-                                       ),
-                                       SizedBox(width: SizeConfig.horizontalPadding),
-                                       Text(
-                                         "Start Trip",
-                                         style:
-                                             TextStyle(fontSize: SizeConfig.smallTextSize,color: CommonColors.white),
-                                       ),
-                                     ],
-                                   ),
-                           ),
-                         ),
-                      ),
-                    
-                    ],
-                  ),
-                ],
-              
-          
-              // if (trip.tripstart == 'Y') ...[
-                
-                Visibility(
-                  visible:trip.tripstart == 'Y' ,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: CommonColors.grey!.withOpacity(0.1),
-                      border:Border(top: BorderSide(color: CommonColors.grey!.withOpacity(0.3),width: 1))
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: SizeConfig.smallVerticalPadding,horizontal: SizeConfig.smallHorizontalPadding),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.check_circle,
-                                color: Colors.green,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 6),
-                          Text(
-                            "Started : ${trip.startdatetime ?? "-"}",
-                            // "Started :test",
-                            style: const TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w600,
+
+              if (trip.tripstart == 'N') ...[
+                // InkWell(
+                //   onTap: () => startTrip(trip),
+                //   borderRadius: BorderRadius.circular(8),
+                //   child: Container(
+
+                //     padding: EdgeInsets.symmetric(
+                //       horizontal: SizeConfig.mediumHorizontalSpacing,
+                //       vertical: SizeConfig.smallVerticalSpacing,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       color: CommonColors.colorPrimary,
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //     child: Row(
+                //       mainAxisSize: MainAxisSize.min,
+                //       children: [
+                //         Icon(
+                //           Icons.play_arrow_rounded,
+                //           color: Colors.white,
+                //           size: SizeConfig.extraLargeIconSize,
+                //         ),
+                //         const SizedBox(width: 6),
+                //         const Text(
+                //           "Start Trip",
+                //           style: TextStyle(
+                //             color: Colors.white,
+                //             fontWeight: FontWeight.w600,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                            horizontal: SizeConfig.extraSmallHorizontalPadding,
+                            vertical: SizeConfig.verticalPadding),
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(SizeConfig.smallRadius),
+                            gradient: LinearGradient(colors: [
+                              CommonColors.red600!,
+                              CommonColors.colorPrimary!
+                            ])),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          //  onPressed:() => startTrip(trip),
+                          onPressed: () => _ValidateTripBeforeStart(trip),
+                          style: ElevatedButton.styleFrom(
+                            // backgroundColor: CommonColors.colorPrimary,
+                            // foregroundColor: CommonColors.White,
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            disabledBackgroundColor: CommonColors.grey300,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
                             ),
-                          ),
-                                          
+                          ), // Disable if not punched in
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.play_arrow_rounded,
+                                size: SizeConfig.largeIconSize,
+                                color: CommonColors.white,
+                              ),
+                              SizedBox(width: SizeConfig.horizontalPadding),
+                              Text(
+                                "Start Trip",
+                                style: TextStyle(
+                                    fontSize: SizeConfig.smallTextSize,
+                                    color: CommonColors.white),
+                              ),
                             ],
                           ),
                         ),
-                        
-                            
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // if (trip.tripstart == 'Y') ...[
+
+              Visibility(
+                visible: trip.tripstart == 'Y',
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: CommonColors.grey!.withOpacity(0.1),
+                      border: Border(
+                          top: BorderSide(
+                              color: CommonColors.grey!.withOpacity(0.3),
+                              width: 1))),
+                  padding: EdgeInsets.symmetric(
+                      vertical: SizeConfig.smallVerticalPadding,
+                      horizontal: SizeConfig.smallHorizontalPadding),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              "Started : ${trip.startdatetime ?? "-"}",
+                              // "Started :test",
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: trip.showclosetripbtn == 'Y',
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal: SizeConfig.extraSmallHorizontalPadding,
+                      vertical: SizeConfig.extraSmallVerticalPadding),
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(SizeConfig.smallRadius),
+                      gradient: LinearGradient(colors: [
+                        CommonColors.red600!,
+                        CommonColors.red500!
+                      ])),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => closeTrip(trip),
+                    style: ElevatedButton.styleFrom(
+                      // backgroundColor: CommonColors.colorPrimary,
+                      // foregroundColor: CommonColors.White,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      disabledBackgroundColor: CommonColors.grey300,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ), // Disable if not punched in
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.play_arrow_rounded,
+                          size: SizeConfig.largeIconSize,
+                          color: CommonColors.white,
+                        ),
+                        SizedBox(width: SizeConfig.horizontalPadding),
+                        Text(
+                          "Close Trip",
+                          style: TextStyle(
+                              fontSize: SizeConfig.smallTextSize,
+                              color: CommonColors.white),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                  Visibility(
-                    visible: trip.showclosetripbtn == 'Y' ,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: SizeConfig.extraSmallHorizontalPadding,vertical: SizeConfig.extraSmallVerticalPadding),
-                         decoration: BoxDecoration(
-                         borderRadius: BorderRadius.circular(SizeConfig.smallRadius),
-                         gradient: LinearGradient(
-                             colors: [CommonColors.red600!, CommonColors.red500!])),
-                       width: double.infinity,
-                       child: ElevatedButton(
-                         onPressed:() => closeTrip(trip),
-                         style: ElevatedButton.styleFrom(
-                           // backgroundColor: CommonColors.colorPrimary,
-                           // foregroundColor: CommonColors.White,
-                           backgroundColor: Colors.transparent,
-                           shadowColor: Colors.transparent,
-                           disabledBackgroundColor: CommonColors.grey300,
-                           padding: const EdgeInsets.symmetric(vertical: 12),
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(18),
-                           ),
-                         ), // Disable if not punched in
-                         child: Row(
-                                 mainAxisAlignment: MainAxisAlignment.center,
-                                 children: [
-                                   Icon(
-                                     Icons.play_arrow_rounded,
-                                     size: SizeConfig.largeIconSize,
-                                     color: CommonColors.white,
-                                   ),
-                                   SizedBox(width: SizeConfig.horizontalPadding),
-                                   Text(
-                                     "Close Trip",
-                                     style:
-                                         TextStyle(fontSize: SizeConfig.smallTextSize,color: CommonColors.white),
-                                   ),
-                                 ],
-                               ),
-                       ),
-                     ),
-                  ),
-                              
-              ],
+              ),
+            ],
             // ],
           )),
     );
@@ -587,19 +611,21 @@ class MidMileTripListState extends State<MidMileTripList> {
       onRefresh: onRefresh,
       child: Scaffold(
         body: Card(
-           shape: RoundedRectangleBorder(
-           borderRadius: BorderRadius.circular(SizeConfig.largeRadius), ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(SizeConfig.largeRadius),
+          ),
           // color: CommonColors.grey200,
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(color: CommonColors.colorPrimary2,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(SizeConfig.largeRadius),topRight: Radius.circular(SizeConfig.largeRadius))
-                ),
-                
+                decoration: BoxDecoration(
+                    color: CommonColors.colorPrimary2,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(SizeConfig.largeRadius),
+                        topRight: Radius.circular(SizeConfig.largeRadius))),
                 padding: EdgeInsets.symmetric(
-                      horizontal: SizeConfig.horizontalPadding,
-                      vertical: SizeConfig.verticalPadding) ,
+                    horizontal: SizeConfig.horizontalPadding,
+                    vertical: SizeConfig.verticalPadding),
                 child: TextField(
                   controller: _searchController,
                   keyboardType: TextInputType.text,

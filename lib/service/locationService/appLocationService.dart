@@ -77,7 +77,39 @@ class AppLocationService {
     }
   }
 
-  /// Reverse geocoding with fallback to Google API
+  // /// Reverse geocoding with fallback to Google API
+  // Future<String?> getAddressFromLatLng(double lat, double lng) async {
+  //   // Stage 1: Try with geocoding package
+  //   try {
+  //     List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+  //     if (placemarks.isNotEmpty) {
+  //       Placemark p = placemarks[0];
+  //       return '${p.street}, ${p.subLocality}, ${p.subAdministrativeArea}, ${p.postalCode}';
+  //     }
+  //   } catch (e) {
+  //     debugPrint('geocoding package failed, trying Google API fallback: $e');
+  //   }
+
+  //   // Stage 2: Fallback to Google Geocoding API if key is available
+  //   if (GOOGLE_MAPS_API_KEY.isNotEmpty) {
+  //     try {
+  //       String host = 'https://maps.google.com/maps/api/geocode/json';
+  //       final url =
+  //           '$host?key=$GOOGLE_MAPS_API_KEY&language=en&latlng=$lat,$lng';
+  //       var response = await http.get(Uri.parse(url));
+  //       if (response.statusCode == 200) {
+  //         Map data = jsonDecode(response.body);
+  //         if (data["results"] != null && data["results"].isNotEmpty) {
+  //           return data["results"][0]["formatted_address"];
+  //         }
+  //       }
+  //     } catch (e) {
+  //       debugPrint('Google API fallback also failed: $e');
+  //     }
+  //   }
+
+  //   return "Location Not Captured";
+  // }
   Future<String?> getAddressFromLatLng(double lat, double lng) async {
     // Stage 1: Try with geocoding package
     try {
@@ -91,7 +123,7 @@ class AppLocationService {
     }
 
     // Stage 2: Fallback to Google Geocoding API if key is available
-    if (GOOGLE_MAPS_API_KEY.isNotEmpty) {
+    if (GOOGLE_MAPS_API_KEY.isNotEmpty && ENABLE_GOOGLE_MAPS) {
       try {
         String host = 'https://maps.google.com/maps/api/geocode/json';
         final url =
@@ -106,8 +138,43 @@ class AppLocationService {
       } catch (e) {
         debugPrint('Google API fallback also failed: $e');
       }
+    }else{
+        try {
+          final url = Uri.https('nominatim.openstreetmap.org','/reverse',{
+              'format': 'jsonv2',
+              'lat': lat.toString(),
+              'lon': lng.toString(),
+              'zoom': '18',
+              'addressdetails': '1',
+              'accept-language': 'en',
+            },
+          );
+
+    final response = await http.get(url,headers: {'User-Agent': 'GTInfiniti/1.0',},
+    ).timeout(const Duration(seconds: 10));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data =
+          jsonDecode(response.body);
+
+      final address = data['display_name'];
+
+      if (address != null &&
+          address.toString().trim().isNotEmpty) {
+        return address.toString();
+      }
+    } else {
+      debugPrint(
+          'OSM API failed: ${response.statusCode}');
+    }
+  } catch (e) {
+    debugPrint('OSM reverse geocoding failed: $e');
+  }
+
     }
 
     return "Location Not Captured";
   }
+
+  
 }

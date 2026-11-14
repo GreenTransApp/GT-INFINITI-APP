@@ -13,6 +13,7 @@ import 'package:gtlmd/common/toast.dart';
 import 'package:gtlmd/design_system/size_config.dart';
 
 import 'package:gtlmd/pages/home/Model/allotedRouteModel.dart';
+import 'package:gtlmd/pages/mapView/OsmMapScreen.dart';
 import 'package:gtlmd/pages/mapView/mapViewPage.dart';
 import 'package:gtlmd/pages/mapView/models/mapConfigJsonModel.dart';
 import 'package:gtlmd/pages/receivedLoad/ReceivedLoadPage.dart';
@@ -48,6 +49,7 @@ class _RoutedetailState extends State<Routedetail> {
 
   bool routeModifyAllowed = false;
   bool hasDeliveries = false;
+  bool enableGoogleAPI = false;
 
   @override
   void initState() {
@@ -62,11 +64,12 @@ class _RoutedetailState extends State<Routedetail> {
             throw Exception("")
           else
             {
+              // _getGoogleMapApiKey(),
+              // getMapConfig()
               setObservers(),
-              _getGoogleMapApiKey(),
               _getRouteChangeAllowedPara(),
               getRouteDetails(),
-              getMapConfig()
+              getValueForGoogleMap()
             }
         });
 
@@ -77,6 +80,22 @@ class _RoutedetailState extends State<Routedetail> {
         showActionBtn = false;
       }
     });
+  }
+
+  getValueForGoogleMap() async {
+    final value = await _baseRepo.returnValueFromCompAccPara({
+      "prmvarname": "GENABLEGOOGLEMAPAPI",
+      "prmcompanyid": savedLogin.companyid.toString(),
+    });
+    if (!isNullOrEmpty(value)) {
+      enableGoogleAPI = value == "Y" ? true : false;
+      if (enableGoogleAPI) {
+        getMapConfig();
+        _getGoogleMapApiKey();
+      }
+    } else {
+      enableGoogleAPI = false;
+    }
   }
 
   @override
@@ -144,10 +163,6 @@ class _RoutedetailState extends State<Routedetail> {
       if (resp.commandstatus == 1) {
         setState(() async {
           modelDetail = resp;
-          // if (totalDistance > 0) {
-          //   modelDetail.totdistance = totalDistance.toString();
-          // }
-
           if (modelDetail.acceptedStatus! == "Y") {
             showUpdateBtn = true;
           } else {
@@ -223,6 +238,19 @@ class _RoutedetailState extends State<Routedetail> {
       routeModifyAllowed = resp == 'Y';
       setState(() {});
     }));
+
+    // _subscription.add(_baseRepo.compAccPara.stream.listen((resp) {
+    //   debugPrint(resp);
+    //   if (!isNullOrEmpty(resp)) {
+    //     enableGoogleAPI = resp == "Y" ? true : false;
+    //     if (enableGoogleAPI) {
+    //       getMapConfig();
+    //       _getGoogleMapApiKey();
+    //     }
+    //   } else {
+    //     enableGoogleAPI = false;
+    //   }
+    // }));
   }
 
   void okayCallBackForAlert() {
@@ -378,6 +406,7 @@ class _RoutedetailState extends State<Routedetail> {
 
   Future<void> refreshScreen() async {
     getRouteDetails();
+    getValueForGoogleMap();
   }
 
   fetchDistanceFromGoogleApi(List<RouteDetailModel> routeDetail) async {
@@ -386,6 +415,46 @@ class _RoutedetailState extends State<Routedetail> {
       // loadingAlertService.showLoading();
       List<int> totalDistanceList =
           await fetchTotalRouteDistance(routeDetail, mapConfig);
+      // loadingAlertService.hideLoading();
+      if (totalDistanceList.isEmpty) {
+        failToast('Unable to calculate route distance.Please Try again.');
+        return;
+      }
+      totalDistance = (totalDistanceList[0].toDouble()) / 1000;
+      // debugPrint("New Distance: $distance");
+      if (totalDistance >
+          double.parse(modelDetail.totdistance!
+              .substring(0, modelDetail.totdistance!.length - 4))) {
+        double diff = totalDistance -
+            double.parse(modelDetail.totdistance!
+                .substring(0, modelDetail.totdistance!.length - 4));
+        double diff2 = double.parse(diff.toStringAsFixed(6));
+
+        showAlert("Distance Increased", const Icon(Icons.update_outlined), "",
+            "Your distance has increased by $diff2 km. Do you still want to update?",
+            () {
+          setState(() {
+            updateSequenceBeforeSubmit(totalDistanceList);
+          });
+        }, () {
+          refreshScreen();
+        });
+      } else if (totalDistance <=
+          double.parse(modelDetail.totdistance!
+              .substring(0, modelDetail.totdistance!.length - 4))) {
+        updateSequenceBeforeSubmit(totalDistanceList);
+      }
+    } catch (err) {
+      debugPrint(err.toString());
+    }
+  }
+
+  fetchDistanceFromOSM(List<RouteDetailModel> routeDetail) async {
+    try {
+      // totalDistance = await fetchTotalRouteDistance(routeDetail);
+      // loadingAlertService.showLoading();
+      List<int> totalDistanceList =
+          await fetchTotalRouteDistanceWithOSM(routeDetail, mapConfig);
       // loadingAlertService.hideLoading();
       if (totalDistanceList.isEmpty) {
         failToast('Unable to calculate route distance.Please Try again.');
@@ -506,10 +575,17 @@ class _RoutedetailState extends State<Routedetail> {
         actions: [
           InkWell(
             onTap: () {
-              Get.to(MapViewPage(
-                model: modelDetail,
-                // routeDetailList: routeDetailList,
-              ));
+              if (enableGoogleAPI) {
+                Get.to(MapViewPage(
+                  model: modelDetail,
+                  // routeDetailList: routeDetailList,
+                ));
+              } else {
+                Get.to(OsmMapScreen(
+                  model: modelDetail,
+                  // routeDetailList: routeDetailList,
+                ));
+              }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -640,7 +716,10 @@ class _RoutedetailState extends State<Routedetail> {
                                   ),
                                 ],
                               ),
-                              Divider(thickness: 1,color: CommonColors.grey200,),
+                              Divider(
+                                thickness: 1,
+                                color: CommonColors.grey200,
+                              ),
                               SizedBox(
                                   height: SizeConfig.mediumVerticalSpacing),
                               Container(
@@ -697,12 +776,15 @@ class _RoutedetailState extends State<Routedetail> {
                     margin: EdgeInsets.symmetric(
                         // vertical: SizeConfig.verticalPadding,
                         horizontal: SizeConfig.horizontalPadding),
-                        
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                    colors: [CommonColors.red600!, CommonColors.colorPrimary!]),
+                      gradient: LinearGradient(colors: [
+                        CommonColors.red600!,
+                        CommonColors.colorPrimary!
+                      ]),
                       // color: CommonColors.colorPrimary,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(SizeConfig.largeRadius),topRight:  Radius.circular(SizeConfig.largeRadius)),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(SizeConfig.largeRadius),
+                          topRight: Radius.circular(SizeConfig.largeRadius)),
                       boxShadow: [
                         BoxShadow(
                           color: CommonColors.appBarColor
@@ -716,7 +798,8 @@ class _RoutedetailState extends State<Routedetail> {
                       children: [
                         Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: SizeConfig.extraSmallHorizontalPadding,
+                              horizontal:
+                                  SizeConfig.extraSmallHorizontalPadding,
                               vertical: SizeConfig.smallVerticalPadding),
                           decoration: BoxDecoration(
                             color: CommonColors.white,
@@ -742,7 +825,7 @@ class _RoutedetailState extends State<Routedetail> {
                       ],
                     ),
                   ),
-                 
+
                   // const SizedBox(height: 16),
                   routeDetailList.isEmpty
                       ? Expanded(
@@ -772,7 +855,11 @@ class _RoutedetailState extends State<Routedetail> {
                                   const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(SizeConfig.largeRadius),bottomRight: Radius.circular(SizeConfig.largeRadius)),
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft:
+                                        Radius.circular(SizeConfig.largeRadius),
+                                    bottomRight: Radius.circular(
+                                        SizeConfig.largeRadius)),
                                 boxShadow: [
                                   BoxShadow(
                                     color: CommonColors.appBarColor
@@ -820,8 +907,14 @@ class _RoutedetailState extends State<Routedetail> {
                                             routeDetailList.insert(
                                                 newIndex, item);
 
-                                            fetchDistanceFromGoogleApi(
-                                                routeDetailList);
+                                            if (enableGoogleAPI) {
+                                              fetchDistanceFromGoogleApi(
+                                                  routeDetailList);
+                                            } else {
+                                              fetchDistanceFromOSM(
+                                                  routeDetailList);
+                                            }
+
                                             // updateSequenceBeforeSubmit();
                                           },
                                         )
@@ -855,30 +948,31 @@ class _RoutedetailState extends State<Routedetail> {
             children: [
               Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                        gradient: LinearGradient(
-                    colors: [CommonColors.red600!, CommonColors.colorPrimary!])
-                    ),
-                    child: ElevatedButton.icon(
-                                    onPressed: () {
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: LinearGradient(colors: [
+                      CommonColors.red600!,
+                      CommonColors.colorPrimary!
+                    ])),
+                child: ElevatedButton.icon(
+                  onPressed: () {
                     alterForReject();
-                                    },
-                                    icon: Icon(Icons.close, size: SizeConfig.smallIconSize),
-                                    label: Text(
+                  },
+                  icon: Icon(Icons.close, size: SizeConfig.smallIconSize),
+                  label: Text(
                     "Reject",
                     style: TextStyle(fontSize: SizeConfig.smallTextSize),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
+                  ),
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: CommonColors.transparent,
-                    shadowColor:  CommonColors.transparent,
+                    shadowColor: CommonColors.transparent,
                     foregroundColor: CommonColors.White,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                                    ),
-                                  ),
-                  )
+                  ),
+                ),
+              )
                   //  InkWell(
                   //   onTap: () {
                   //     alterForReject();
@@ -901,23 +995,25 @@ class _RoutedetailState extends State<Routedetail> {
               ),
               Expanded(
                   child: Container(
-                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                        gradient: LinearGradient(
-                    colors: [CommonColors.whatsapp!, CommonColors.successColor!])
-                    ),
-                    child: ElevatedButton.icon(
-                                    onPressed: () {
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: LinearGradient(colors: [
+                      CommonColors.whatsapp!,
+                      CommonColors.successColor!
+                    ])),
+                child: ElevatedButton.icon(
+                  onPressed: () {
                     // alterForAccept();
                     List<RouteDetailModel> _routeList =
                         List.empty(growable: true);
-                    
+
                     _routeList.addAll(routeDetailList.where((routeDetailList) =>
                         !routeDetailList.grno!.contains("Pickup") &&
                         !routeDetailList.grno!.contains("Final Point")));
                     if (_routeList.isNotEmpty && hasDeliveries) {
                       Get.to(() => ReceivedLoadPage(
-                              receivedLoadList: _routeList, model: modelDetail))!
+                              receivedLoadList: _routeList,
+                              model: modelDetail))!
                           .then(
                         (value) => {refreshScreen()},
                       );
@@ -925,11 +1021,11 @@ class _RoutedetailState extends State<Routedetail> {
                       // _acceptRoute();
                       alterForAccept();
                     }
-                                    },
-                                    icon: Icon(Icons.list, size: SizeConfig.smallIconSize),
-                                    // label: const Text("Accept"),
-                                    // label: const Text("Receive Load"),
-                                    label: hasDeliveries
+                  },
+                  icon: Icon(Icons.list, size: SizeConfig.smallIconSize),
+                  // label: const Text("Accept"),
+                  // label: const Text("Receive Load"),
+                  label: hasDeliveries
                       ? Text(
                           "Receive Load",
                           style: TextStyle(fontSize: SizeConfig.smallTextSize),
@@ -938,16 +1034,16 @@ class _RoutedetailState extends State<Routedetail> {
                           "Accept",
                           style: TextStyle(fontSize: SizeConfig.smallTextSize),
                         ),
-                                    style: ElevatedButton.styleFrom(
-                                     backgroundColor: CommonColors.transparent,
-                      shadowColor:  CommonColors.transparent,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CommonColors.transparent,
+                    shadowColor: CommonColors.transparent,
                     foregroundColor: CommonColors.White,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                                    ),
-                                  ),
-                  )
+                  ),
+                ),
+              )
                   //  InkWell(
                   //   onTap: () {
                   //     alterForAccept();
@@ -978,14 +1074,13 @@ class _RoutedetailState extends State<Routedetail> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SizeConfig.horizontalPadding),
       child: Container(
-         padding: EdgeInsets.symmetric(
-                  horizontal: SizeConfig.extraSmallHorizontalPadding,
-                  vertical: SizeConfig.extraSmallVerticalPadding),
+        padding: EdgeInsets.symmetric(
+            horizontal: SizeConfig.extraSmallHorizontalPadding,
+            vertical: SizeConfig.extraSmallVerticalPadding),
         decoration: BoxDecoration(
-          color: color.withAlpha((0.1 *255).round()),
-          border: Border.all(color:color.withAlpha((0.1 *255).round()) ),
-          borderRadius: BorderRadius.circular(SizeConfig.mediumRadius)
-          ),
+            color: color.withAlpha((0.1 * 255).round()),
+            border: Border.all(color: color.withAlpha((0.1 * 255).round())),
+            borderRadius: BorderRadius.circular(SizeConfig.mediumRadius)),
         child: Row(
           children: [
             Container(

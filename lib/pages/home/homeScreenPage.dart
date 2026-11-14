@@ -35,6 +35,7 @@ import 'package:gtlmd/pages/offlineView/offlineDrsBottomSheet.dart';
 import 'package:gtlmd/pages/orders/drsSelection/drsSelectionBottomSheet.dart';
 import 'package:gtlmd/pages/routes/routesList/allotedRouteWidget.dart';
 import 'package:gtlmd/pages/runningTrips/runningTrips.dart';
+import 'package:gtlmd/pages/mapView/OsmMapScreen.dart';
 import 'package:gtlmd/pages/trips/tripDetail/Model/currentDeliveryModel.dart';
 import 'package:gtlmd/pages/trips/tripDetail/Model/tripModel.dart';
 import 'package:gtlmd/pages/updateVersionScreen/updateVersionScreen.dart';
@@ -268,7 +269,7 @@ class _HomeScreen extends State<HomeScreen>
 
     _subscriptions
         .add(viewModel.validateDeviceLiveData.stream.listen((validate) {
-      setState(() {
+      setState(() async {
         if (validate.validlogin == "N" || validate.singledevice == "N") {
           failToast(validate.commandmessage.toString());
           authService.logout(context);
@@ -280,19 +281,26 @@ class _HomeScreen extends State<HomeScreen>
           // } else if (validate.executiveid == null) {
           //   failToast("Invalid User details");
           //   authService.logout(context);
-        } else{
-           if(isNullOrEmpty(savedUser.drivercode)){
-              // Get.off(UserDashboardPage());
+        } else {
+          if (isNullOrEmpty(savedUser.drivercode)) {
+            // Get.off(UserDashboardPage());
             // failToast("Driver Details Not Found Please Contact Admin.");
             // authService.logout(context);
-           }
-
-        } 
+          }
+           final value = await _baseRepo.returnValueFromCompAccPara({
+          "prmvarname": "GENABLEGOOGLEMAPAPI",
+          "prmcompanyid": savedLogin.companyid.toString(),
+        });
+        if (!isNullOrEmpty(value)) {
+          ENABLE_GOOGLE_MAPS = value == "Y";
+        }
+        }
         // else if (isNullOrEmpty(validate.executiveid.toString()) == false &&
         //     int.parse(validate.executiveid.toString()) > 0) {
         //   // getNotifiocaionCount();
         //   // getDashboardDetails();
         // }
+       
       });
     }));
 
@@ -1291,7 +1299,7 @@ class _HomeScreen extends State<HomeScreen>
                         ],
                       ),
                     ),
-                     const PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'fuelDetailEntry',
                       child: Row(
                         children: [
@@ -1611,45 +1619,44 @@ class _HomeScreen extends State<HomeScreen>
                 Column(
                   children: [
                     attendanceInfo(),
-                    // const SizedBox(height: 16),
-                    // Visibility(
-                    //   visible: ENV.isDebugging,
-                    //   child: GestureDetector(
-                    //     onTap: () async {
-                    //       Get.to(const MidMileTripList());
-                    //     },
-                    //     child: Container(
-                    //       padding: EdgeInsets.symmetric(
-                    //           horizontal: isSmallDevice ? 8 : 16,
-                    //           vertical: isSmallDevice ? 8 : 12),
-                    //       margin: EdgeInsets.only(
-                    //           top: 16,
-                    //           bottom: 4,
-                    //           left: isSmallDevice ? 8 : 16,
-                    //           right: isSmallDevice ? 8 : 16),
-                    //       decoration: BoxDecoration(
-                    //         color: CommonColors.colorPrimary,
-                    //         borderRadius: BorderRadius.circular(12),
-                    //         boxShadow: const [
-                    //           BoxShadow(
-                    //             color: Colors.black12,
-                    //             blurRadius: 4,
-                    //             offset: Offset(0, 2),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //       child: Text(
-                    //         'Test',
-                    //         style: TextStyle(
-                    //           fontSize: isSmallDevice ? 12 : 14,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Colors.white,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-
+                    const SizedBox(height: 16),
+                    Visibility(
+                      visible: ENV.isDebugging,
+                      child: GestureDetector(
+                        onTap: () async {
+                          Get.to(const OsmMapScreen());
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: isSmallDevice ? 8 : 16,
+                              vertical: isSmallDevice ? 8 : 12),
+                          margin: EdgeInsets.only(
+                              top: 16,
+                              bottom: 4,
+                              left: isSmallDevice ? 8 : 16,
+                              right: isSmallDevice ? 8 : 16),
+                          decoration: BoxDecoration(
+                            color: CommonColors.colorPrimary,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'Test',
+                            style: TextStyle(
+                              fontSize: isSmallDevice ? 12 : 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     Expanded(
                       child: AllocatedRouteWidget(
                         key: allotedRouteKey,
