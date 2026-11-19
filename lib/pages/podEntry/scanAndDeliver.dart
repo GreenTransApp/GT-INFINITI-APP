@@ -153,6 +153,8 @@ class _ScanAndLoadState extends State<ScanAndLoad> {
           unSelectedStickersList.remove(sticker);
           sticker.isreceived = true;
         }
+      }else{
+          failToast("Sticker not found in the list");
       }
     }
     _applyFilterAndSort();

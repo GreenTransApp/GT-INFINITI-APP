@@ -532,9 +532,10 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                               break;
                           }
                         },
-                        itemBuilder: (context) => [
-                          if (widget.model.consignmenttype == 'P' &&
-                              status == 'Picked' && isNullOrEmpty(widget.model.issplitorder) || widget.model.issplitorder != 'Y')
+                        itemBuilder: (context) {
+                            final isSplitOrderEntry = isNullOrEmpty(widget.model.issplitorder)? "N": widget.model.issplitorder;
+                          return [if (widget.model.consignmenttype == "P" &&
+                              status == "Picked" && isSplitOrderEntry == "N")
                             const PopupMenuItem(
                               value: 'enquiry',
                               child: Row(
@@ -582,7 +583,7 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                               ],
                             ),
                           ),
-                        ],
+                        ];},
                       ),
                     ],
                   ),
@@ -1274,170 +1275,402 @@ class _RouteDetailTileState extends State<DeliveryDetailTile> {
                           ],
                         ),
                       ],
-                      if (modelDetail.consignmenttype == "P" &&
-                          (modelDetail.pickupstatus == "P")) ...[
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  LmdMenuModel? targetMenu;
-                                  try {
-                                    targetMenu = widget.menuList.firstWhere(
-                                        (element) =>
-                                            element.tag?.toString() ==
-                                            'rejectpickup');
-                                    {
-                                      {
-                                        menuCode =
-                                            targetMenu.menuCode.toString();
-                                      }
-                                    }
-                                  } catch (e) {
-                                    targetMenu = null;
-                                  }
+                      // if (modelDetail.consignmenttype == "P" &&
+                      //     (modelDetail.pickupstatus == "P")) ...[
+                        
+                      //   const SizedBox(height: 16),
+                      //   Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: ElevatedButton.icon(
+                      //           onPressed: () {
+                      //             LmdMenuModel? targetMenu;
+                      //             try {
+                      //               targetMenu = widget.menuList.firstWhere(
+                      //                   (element) =>
+                      //                       element.tag?.toString() ==
+                      //                       'rejectpickup');
+                      //               {
+                      //                 {
+                      //                   menuCode =
+                      //                       targetMenu.menuCode.toString();
+                      //                 }
+                      //               }
+                      //             } catch (e) {
+                      //               targetMenu = null;
+                      //             }
 
-                                  String fileName =
-                                      targetMenu?.fileName ?? 'RejectPickup';
+                      //             String fileName =
+                      //                 targetMenu?.fileName ?? 'RejectPickup';
 
-                                  if (fileName == 'RejectPickup') {
-                                     if (widget.model.reached == 'N') {
-                                      failToast("Not reached");
-                                      return;
-                                    }
-                                    Get.to(RejectPickup(details: widget.model))
-                                        ?.then((_) {
-                                      widget.onRefresh();
-                                    });
-                                  } else {
-                                    failToast("Screen $fileName not mapped.");
-                                  }
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  size: SizeConfig.mediumIconSize,
-                                  color: CommonColors.dangerColor,
-                                ),
-                                label: Text('Reject',
-                                    style: TextStyle(
-                                        fontSize: SizeConfig.smallTextSize,
-                                        color: CommonColors.dangerColor)),
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical:
-                                          SizeConfig.extraSmallVerticalSpacing),
-                                  backgroundColor: CommonColors.white,
-                                  foregroundColor: CommonColors.White,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  side: BorderSide(
-                                    color: CommonColors
-                                        .dangerColor!, // Border color
-                                    width: 3.0, // Border thickness
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: SizeConfig.smallHorizontalPadding,
-                            ),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  LmdMenuModel? targetMenu;
-                                  print(MenuTags.PICKUP.name.toString());
-                                  try {
-                                    targetMenu = widget.menuList.firstWhere(
-                                        (element) =>
-                                            element.tag?.toString() ==
-                                            MenuTags.PICKUP.name.toString());
-                                    {
-                                      {
-                                        menuCode =
-                                            targetMenu.menuCode.toString();
-                                      }
-                                    }
-                                    {}
-                                  } catch (e) {
-                                    targetMenu = null;
-                                  }
+                      //             if (fileName == 'RejectPickup') {
+                      //                if (widget.model.reached == 'N') {
+                      //                 failToast("Not reached");
+                      //                 return;
+                      //               }
+                      //               Get.to(RejectPickup(details: widget.model))
+                      //                   ?.then((_) {
+                      //                 widget.onRefresh();
+                      //               });
+                      //             } else {
+                      //               failToast("Screen $fileName not mapped.");
+                      //             }
+                      //           },
+                      //           icon: Icon(
+                      //             Icons.close,
+                      //             size: SizeConfig.mediumIconSize,
+                      //             color: CommonColors.dangerColor,
+                      //           ),
+                      //           label: Text('Reject',
+                      //               style: TextStyle(
+                      //                   fontSize: SizeConfig.smallTextSize,
+                      //                   color: CommonColors.dangerColor)),
+                      //           style: ElevatedButton.styleFrom(
+                      //             padding: EdgeInsets.symmetric(
+                      //                 vertical:
+                      //                     SizeConfig.extraSmallVerticalSpacing),
+                      //             backgroundColor: CommonColors.white,
+                      //             foregroundColor: CommonColors.White,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(8),
+                      //             ),
+                      //             side: BorderSide(
+                      //               color: CommonColors
+                      //                   .dangerColor!, // Border color
+                      //               width: 3.0, // Border thickness
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(
+                      //         width: SizeConfig.smallHorizontalPadding,
+                      //       ),
+                      //       Expanded(
+                      //         child: ElevatedButton.icon(
+                      //           onPressed: () {
+                      //             LmdMenuModel? targetMenu;
+                      //             print(MenuTags.PICKUP.name.toString());
+                      //             try {
+                      //               targetMenu = widget.menuList.firstWhere(
+                      //                   (element) =>
+                      //                       element.tag?.toString() ==
+                      //                       MenuTags.PICKUP.name.toString());
+                      //               {
+                      //                 {
+                      //                   menuCode =
+                      //                       targetMenu.menuCode.toString();
+                      //                 }
+                      //               }
+                      //               {}
+                      //             } catch (e) {
+                      //               targetMenu = null;
+                      //             }
 
-                                  String fileName =
-                                      targetMenu?.fileName?.toLowerCase() ??
-                                          'pickup';
+                      //             String fileName =
+                      //                 targetMenu?.fileName?.toLowerCase() ??
+                      //                     'pickup';
 
-                                  if (fileName == 'OtexPickupScreen' ||
-                                      fileName == 'otexpickupscreen') {
-                                    if (widget.model.reached == 'N') {
-                                      failToast("Not reached");
-                                      return;
-                                    }
-                                    Get.to(
-                                      OtexPickupScreen(
-                                        transactionId: isNullOrEmpty(widget
-                                                .model.transactionid
-                                                .toString())
-                                            ? '0'
-                                            : widget.model.transactionid
-                                                .toString(),
-                                        grno: widget.model.grno.toString(),
-                                        orderid: isNullOrEmpty(
-                                                widget.model.orderid.toString())
-                                            ? '0'
-                                            : widget.model.orderid.toString(),
-                                        jobid: isNullOrEmpty(
-                                                widget.model.jobid.toString())
-                                            ? '0'
-                                            : widget.model.jobid.toString(),
-                                      ),
-                                    )?.then((_) {
-                                      widget.onRefresh();
-                                    });
-                                  } else if (fileName == 'Pickup' ||
-                                      fileName == 'pickup') {
-                                    if (widget.model.reached == 'N') {
-                                      failToast("Not reached");
-                                      return;
-                                    }
-                                    Get.to(Pickup(details: widget.model))
-                                        ?.then((_) {
-                                      widget.onRefresh();
-                                    });
-                                  } else {
-                                    failToast("Screen $fileName not mapped.");
-                                  }
-                                },
-                                icon: Icon(
-                                  Icons.check,
-                                  size: SizeConfig.mediumIconSize,
+                      //             if (fileName == 'OtexPickupScreen' ||
+                      //                 fileName == 'otexpickupscreen') {
+                      //               if (widget.model.reached == 'N') {
+                      //                 failToast("Not reached");
+                      //                 return;
+                      //               }
+                      //               Get.to(
+                      //                 OtexPickupScreen(
+                      //                   transactionId: isNullOrEmpty(widget
+                      //                           .model.transactionid
+                      //                           .toString())
+                      //                       ? '0'
+                      //                       : widget.model.transactionid
+                      //                           .toString(),
+                      //                   grno: widget.model.grno.toString(),
+                      //                   orderid: isNullOrEmpty(
+                      //                           widget.model.orderid.toString())
+                      //                       ? '0'
+                      //                       : widget.model.orderid.toString(),
+                      //                   jobid: isNullOrEmpty(
+                      //                           widget.model.jobid.toString())
+                      //                       ? '0'
+                      //                       : widget.model.jobid.toString(),
+                      //                 ),
+                      //               )?.then((_) {
+                      //                 widget.onRefresh();
+                      //               });
+                      //             } else if (fileName == 'Pickup' ||
+                      //                 fileName == 'pickup') {
+                      //               if (widget.model.reached == 'N') {
+                      //                 failToast("Not reached");
+                      //                 return;
+                      //               }
+                      //               Get.to(Pickup(details: widget.model))
+                      //                   ?.then((_) {
+                      //                 widget.onRefresh();
+                      //               });
+                      //             } else {
+                      //               failToast("Screen $fileName not mapped.");
+                      //             }
+                      //           },
+                      //           icon: Icon(
+                      //             Icons.check,
+                      //             size: SizeConfig.mediumIconSize,
+                      //             color: CommonColors.colorPrimary2,
+                      //           ),
+                      //           label: Text('Pickup',
+                      //               style: TextStyle(
+                      //                   fontSize: SizeConfig.smallTextSize,
+                      //                   color: CommonColors.colorPrimary2)),
+                      //           style: ElevatedButton.styleFrom(
+                      //             padding: EdgeInsets.symmetric(
+                      //                 vertical:
+                      //                     SizeConfig.extraSmallVerticalSpacing),
+                      //             backgroundColor: CommonColors.white,
+                      //             foregroundColor: CommonColors.White,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(8),
+                      //             ),
+                      //             side: BorderSide(
+                      //               color: CommonColors
+                      //                   .colorPrimary2!, // Border color
+                      //               width: 3.0, // Border thickness
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ],
+                     const SizedBox(height: 16),
+                         Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: SizeConfig.horizontalPadding,
+                        vertical: SizeConfig.extraSmallVerticalPadding),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: CommonColors.white!,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                isNullOrEmpty(modelDetail.pickupstatusupdateon
+                                        .toString())
+                                    ? 'Pending'
+                                    : widget.model.pickupstatusupdateon
+                                        .toString(),
+                                style: TextStyle(
+                                  fontSize: SizeConfig.extraSmallTextSize,
+                                  fontWeight: FontWeight.w600,
                                   color: CommonColors.colorPrimary2,
                                 ),
-                                label: Text('Pickup',
-                                    style: TextStyle(
-                                        fontSize: SizeConfig.smallTextSize,
-                                        color: CommonColors.colorPrimary2)),
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical:
-                                          SizeConfig.extraSmallVerticalSpacing),
-                                  backgroundColor: CommonColors.white,
-                                  foregroundColor: CommonColors.White,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  side: BorderSide(
-                                    color: CommonColors
-                                        .colorPrimary2!, // Border color
-                                    width: 3.0, // Border thickness
+                              ),
+                              if (isNullOrEmpty(modelDetail.pickupstatusupdateon
+                                  .toString())) ...[
+                                const ImageIcon(
+                                    AssetImage('assets/images/loading.png'))
+                              ]
+                            ],
+                          ),
+                        ),
+                        if (modelDetail.consignmenttype == "P" &&
+                            (modelDetail.pickupstatus == "P")) ...[
+                          Expanded(
+                            child: Column(
+                  
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    LmdMenuModel? targetMenu;
+                                    print(MenuTags.PICKUP.name.toString());
+                                    try {
+                                      targetMenu = widget.menuList.firstWhere(
+                                          (element) =>
+                                              element.tag?.toString() ==
+                                              MenuTags.PICKUP.name
+                                                  .toString());
+                                      {
+                                        {
+                                          menuCode =
+                                              targetMenu.menuCode.toString();
+                                        }
+                                      }
+                                      {}
+                                    } catch (e) {
+                                      targetMenu = null;
+                                    }
+                                
+                                    String fileName =
+                                        targetMenu?.fileName?.toLowerCase() ??
+                                            'pickup';
+                                
+                                    if (fileName == 'OtexPickupScreen' ||
+                                        fileName == 'otexpickupscreen') {
+                                      if (widget.model.reached == 'N') {
+                                        failToast("Not reached");
+                                        return;
+                                      }
+                                      Get.to(
+                                        OtexPickupScreen(
+                                          transactionId: isNullOrEmpty(widget
+                                                  .model.transactionid
+                                                  .toString())
+                                              ? '0'
+                                              : widget.model.transactionid
+                                                  .toString(),
+                                          grno: widget.model.grno.toString(),
+                                          orderid: isNullOrEmpty(widget
+                                                  .model.orderid
+                                                  .toString())
+                                              ? '0'
+                                              : widget.model.orderid
+                                                  .toString(),
+                                          jobid: isNullOrEmpty(widget
+                                                  .model.jobid
+                                                  .toString())
+                                              ? '0'
+                                              : widget.model.jobid.toString(),
+                                        ),
+                                      )?.then((_) {
+                                        widget.onRefresh();
+                                      });
+                                    } else if (fileName == 'Pickup' ||
+                                        fileName == 'pickup') {
+                                      if (widget.model.reached == 'N') {
+                                        failToast("Not reached");
+                                        return;
+                                      }
+                                      Get.to(Pickup(details: widget.model))
+                                          ?.then((_) {
+                                        widget.onRefresh();
+                                      });
+                                    } else {
+                                      failToast(
+                                          "Screen $fileName not mapped.");
+                                    }
+                                  },
+                                  // icon: Icon(Icons.close, size: SizeConfig.mediumIconSize),
+                                  label: Text('Pickup',
+                                      style: TextStyle(
+                                          color: CommonColors.colorPrimary2,
+                                          fontSize:
+                                              SizeConfig.extraSmallTextSize)),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            SizeConfig.horizontalPadding,
+                                        vertical: SizeConfig
+                                            .extraSmallVerticalPadding),
+                                    backgroundColor: CommonColors.white,
+                                    foregroundColor: CommonColors.White,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    side: BorderSide(
+                                      color: CommonColors
+                                          .colorPrimary2, // Border color
+                                      width: 3.0, // Border thickness
+                                    ),
                                   ),
                                 ),
-                              ),
+                                SizedBox(
+                                  width: SizeConfig.extraSmallHorizontalSpacing,
+                                ),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    LmdMenuModel? targetMenu;
+                                    try {
+                                      targetMenu = widget.menuList.firstWhere(
+                                          (element) =>
+                                              element.tag?.toString() ==
+                                              'rejectpickup');
+                                      {
+                                        {
+                                          menuCode =
+                                              targetMenu.menuCode.toString();
+                                        }
+                                      }
+                                    } catch (e) {
+                                      targetMenu = null;
+                                    }
+                                
+                                    String fileName = targetMenu?.fileName ??
+                                        'RejectPickup';
+                                
+                                    if (fileName == 'RejectPickup') {
+                                       if (widget.model.reached == 'N') {
+                                        failToast("Not reached");
+                                        return;
+                                      }
+                                      Get.to(RejectPickup(
+                                              details: widget.model))
+                                          ?.then((_) {
+                                        widget.onRefresh();
+                                      });
+                                    } else {
+                                      failToast(
+                                          "Screen $fileName not mapped.");
+                                    }
+                                  },
+                                  //  icon: Icon(Icons.close, size: SizeConfig.mediumIconSize),
+                                  label: Text('Reject',
+                                      style: TextStyle(
+                                        color: CommonColors.dangerColor,
+                                        fontSize:
+                                            SizeConfig.extraSmallTextSize,
+                                      )),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        // vertical:
+                                        //     SizeConfig.extraSmallVerticalSpacing,
+                                        horizontal: SizeConfig
+                                            .extraSmallHorizontalSpacing),
+                                    backgroundColor: CommonColors.white,
+                                    foregroundColor: CommonColors.White,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    side: BorderSide(
+                                      color: CommonColors
+                                          .red600!, // Border color
+                                      width: 3.0, // Border thickness
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                        // Visibility(
+                        //   visible:
+                        if (modelDetail.consignmenttype == "P" &&
+                            (modelDetail.pickupstatus == "D")) ...[
+                          // child:
+                          Row(
+                            children: [
+                              Text(
+                                'Picked',
+                                style: TextStyle(
+                                  fontSize: SizeConfig.smallTextSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: CommonColors.green600,
+                                ),
+                              ),
+                              Icon(
+                                Icons.check_circle,
+                                color: CommonColors.green600,
+                              ),
+                              // SizedBox(width: SizeConfig.smallHorizontalPadding),
+                            ],
+                          ),
+                        ]
+                        // ),
                       ],
+                    ),
+                  ),
+                
                       if (modelDetail.consignmenttype == "P" &&
                           modelDetail.showdeparted == "Y") ...[
                         SizedBox(height: SizeConfig.smallVerticalSpacing),
